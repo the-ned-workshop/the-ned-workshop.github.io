@@ -1,5 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEvents, formatEventDate } from '../lib/events';
+
+const events = await getEvents();
+const now = new Date();
+const upcomingEvents = events.filter(e => e.date >= now);
 ---
 
 <BaseLayout title="Home">
@@ -20,26 +25,49 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         Upcoming Events
       </h2>
       <div class="space-y-6">
-        <!-- Earring Making Event -->
-        <div class="bg-amber-50 rounded-2xl p-6 border border-amber-200">
-          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
-            <h3 class="text-2xl font-bold text-amber-700">Earring Making Event</h3>
-            <div class="text-right">
-              <p class="text-lg font-bold text-amber-600">Saturday, February 7th</p>
-              <p class="text-stone-600 font-medium">1:00 PM - 3:00 PM</p>
+        {upcomingEvents.length > 0 ? (
+          upcomingEvents.map((event) => (
+            <div class="bg-amber-50 rounded-2xl p-6 border border-amber-200">
+              <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+                <h3 class="text-2xl font-bold text-amber-700">{event.title}</h3>
+                <div class="md:text-right">
+                  <p class="text-lg font-bold text-amber-600">{formatEventDate(event.date)}</p>
+                  <p class="text-stone-600 font-medium">{event.startTime} - {event.endTime}</p>
+                </div>
+              </div>
+              <div class="space-y-3 text-stone-600 font-medium">
+                {event.description.split('\n\n').map((paragraph) => (
+                  <p>{paragraph}</p>
+                ))}
+                <div class="pt-3 border-t border-amber-200">
+                  <p>
+                    <span class="font-bold text-amber-700">Location:</span>{' '}
+                    {event.locationUrl ? (
+                      <a href={event.locationUrl} target="_blank" rel="noopener noreferrer" class="text-amber-600 hover:text-amber-700 underline decoration-amber-300 decoration-2 underline-offset-4 hover:decoration-amber-400 transition-colors duration-300">
+                        {event.location}
+                      </a>
+                    ) : (
+                      event.location
+                    )}
+                  </p>
+                  <p>
+                    <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+                    {event.costNote && ` - ${event.costNote}`}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="space-y-3 text-stone-600 font-medium">
-            <p>
-              Come join our first event celebrating girl power by making sewn earrings that look like lil vaginas and hearts and such. You'll learn some basic hand sewing skills and will get time to chat and drink with friends. You don't have to be a gal to attend!
+          ))
+        ) : (
+          <div>
+            <p class="text-lg text-stone-500 italic font-medium">
+              No upcoming events scheduled.
             </p>
-            <div class="pt-3 border-t border-amber-200">
-              <p><span class="font-bold text-amber-700">Location:</span> <a href="https://www.google.com/maps/place/Ned+General/@39.9616,-105.5108,17z" target="_blank" rel="noopener noreferrer" class="text-amber-600 hover:text-amber-700 underline decoration-amber-300 decoration-2 underline-offset-4 hover:decoration-amber-400 transition-colors duration-300">Ned General</a></p>
-              <p><span class="font-bold text-amber-700">Cost:</span> FREE - all supplies provided</p>
-              <p class="text-stone-500 text-sm italic">Food and drinks available for purchase at Ned General</p>
-            </div>
+            <p class="text-lg text-stone-600 font-medium mt-4">
+              Check back here for updates on classes, open workshop hours, and community events.
+            </p>
           </div>
-        </div>
+        )}
       </div>
     </div>
 
