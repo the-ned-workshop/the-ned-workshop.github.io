@@ -1,6 +1,6 @@
 ---
 title: Earring Making Event
-date: 2025-02-07
+date: 2026-02-07
 startTime: "1:00 PM"
 endTime: "3:00 PM"
 location: Ned General
