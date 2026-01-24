@@ -11,19 +11,19 @@ const upcomingEvents = events.filter(e => e.date >= now);
   <div class="max-w-5xl mx-auto px-6 py-16">
     <!-- Hero Section -->
     <div class="text-center mb-20">
-      <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-tight text-amber-600">
+      <h1 class="text-5xl md:text-7xl font-extrabold leading-tight text-amber-600">
         Welcome to The Ned Workshop!
       </h1>
-      <p class="text-xl md:text-2xl text-stone-600 max-w-2xl mx-auto font-semibold leading-relaxed">
-        More to come as we build out the class content and find a venue(s).
-      </p>
     </div>
 
     <!-- Upcoming Events Card -->
     <div class="card p-10 mb-10">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-amber-600">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-2 text-amber-600">
         Upcoming Events
       </h2>
+      <p class="text-stone-500 font-medium mb-6">
+        More to come as we build out the class content and find a venue(s).
+      </p>
       <div class="space-y-6">
         {upcomingEvents.length > 0 ? (
           upcomingEvents.map((event) => (
