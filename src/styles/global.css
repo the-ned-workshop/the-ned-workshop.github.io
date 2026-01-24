@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-amber-50 text-stone-800 antialiased overflow-x-hidden;
+    font-family: 'Baloo 2', cursive, system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border-2 border-amber-200 overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-amber-300;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-8 py-4 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-primary {
+    @apply bg-amber-500 text-white hover:bg-amber-600;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-amber-600 border-2 border-amber-300 hover:bg-amber-50;
+  }
+
+  /* Goop Blob Styles */
+  .blob {
+    @apply absolute rounded-full mix-blend-multiply filter blur-xl opacity-50;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+
+  .blob-1 {
+    @apply bg-amber-200;
+  }
+
+  .blob-2 {
+    @apply bg-amber-300;
+  }
+
+  .blob-3 {
+    @apply bg-amber-200;
+  }
+
+  .blob-4 {
+    @apply bg-amber-300;
+  }
+
+  .blob-5 {
+    @apply bg-amber-200;
+  }
+}

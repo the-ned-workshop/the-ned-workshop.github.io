@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Home">
+  <div class="max-w-5xl mx-auto px-6 py-16">
+    <!-- Hero Section -->
+    <div class="text-center mb-20">
+      <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-tight text-amber-600">
+        Welcome to The Ned Workshop!
+      </h1>
+      <p class="text-xl md:text-2xl text-stone-600 max-w-2xl mx-auto font-semibold leading-relaxed">
+        More to come as we build out the class content and find a venue(s).
+      </p>
+    </div>
+
+    <!-- Upcoming Events Card -->
+    <div class="card p-10 mb-10">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-amber-600">
+        Upcoming Events
+      </h2>
+      <div class="space-y-6">
+        <!-- Earring Making Event -->
+        <div class="bg-amber-50 rounded-2xl p-6 border border-amber-200">
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+            <h3 class="text-2xl font-bold text-amber-700">Earring Making Event</h3>
+            <div class="text-right">
+              <p class="text-lg font-bold text-amber-600">Saturday, February 7th</p>
+              <p class="text-stone-600 font-medium">1:00 PM - 3:00 PM</p>
+            </div>
+          </div>
+          <div class="space-y-3 text-stone-600 font-medium">
+            <p>
+              Come join our first event celebrating girl power by making sewn earrings that look like lil vaginas and hearts and such. You'll learn some basic hand sewing skills and will get time to chat and drink with friends. You don't have to be a gal to attend!
+            </p>
+            <div class="pt-3 border-t border-amber-200">
+              <p><span class="font-bold text-amber-700">Location:</span> Ned General</p>
+              <p><span class="font-bold text-amber-700">Cost:</span> FREE - all supplies provided</p>
+              <p class="text-stone-500 text-sm italic">Food and drinks available for purchase at Ned General</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Card -->
+    <div class="card p-10">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-amber-600">
+        Say Hello!
+      </h2>
+      <p class="text-xl text-stone-600 font-medium">
+        Reach out at
+        <a href="mailto:info@nedworkshop.org" class="font-bold text-amber-600 hover:text-amber-700 underline decoration-amber-300 decoration-2 underline-offset-4 hover:decoration-amber-400 transition-colors duration-300">
+          info@nedworkshop.org
+        </a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>
