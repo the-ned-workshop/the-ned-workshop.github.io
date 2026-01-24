@@ -8,6 +8,7 @@ export interface Event {
   locationUrl?: string;
   cost: string;
   costNote?: string;
+  image?: string;
   description: string;
 }
 
@@ -52,6 +53,7 @@ export async function getEvents(): Promise<Event[]> {
       locationUrl: data.locationUrl,
       cost: data.cost ?? '',
       costNote: data.costNote,
+      image: data.image,
       description,
     });
   }

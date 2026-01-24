@@ -35,7 +35,11 @@ const upcomingEvents = events.filter(e => e.date >= now);
                   <p class="text-stone-600 font-medium">{event.startTime} - {event.endTime}</p>
                 </div>
               </div>
-              <div class="space-y-3 text-stone-600 font-medium">
+              <div class={event.image ? "flex flex-col md:flex-row gap-4" : ""}>
+                {event.image && (
+                  <img src={event.image.replace(/^\/public/, '')} alt={event.title} class="rounded-xl w-32 h-32 object-cover border border-amber-200 flex-shrink-0" />
+                )}
+                <div class="space-y-3 text-stone-600 font-medium">
                 {event.description.split('\n\n').map((paragraph) => (
                   <p>{paragraph}</p>
                 ))}
@@ -55,6 +59,7 @@ const upcomingEvents = events.filter(e => e.date >= now);
                     {event.costNote && ` - ${event.costNote}`}
                   </p>
                 </div>
+              </div>
               </div>
             </div>
           ))
