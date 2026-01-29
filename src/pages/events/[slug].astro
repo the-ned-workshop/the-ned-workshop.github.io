@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getEvents, formatEventDate } from '../../lib/events';
+
+export async function getStaticPaths() {
+  const events = await getEvents();
+  return events.map(event => ({
+    params: { slug: event.slug },
+    props: { event },
+  }));
+}
+
+const { event } = Astro.props;
+
+const eventImage = event.image ? event.image.replace(/^\/public/, '') : '/images/meta-image.png';
+
+// Format date for JSON-LD (ISO 8601)
+const eventDateStr = event.date.toISOString().split('T')[0];
+
+// Parse time to create ISO datetime
+function parseTime(timeStr: string, dateStr: string): string {
+  const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!match) return `${dateStr}T12:00:00`;
+  let hours = parseInt(match[1]);
+  const minutes = match[2];
+  const period = match[3].toUpperCase();
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+  return `${dateStr}T${hours.toString().padStart(2, '0')}:${minutes}:00`;
+}
+
+const startDateTime = parseTime(event.startTime, eventDateStr);
+const endDateTime = parseTime(event.endTime, eventDateStr);
+
+const eventJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": event.title,
+  "description": event.description,
+  "startDate": startDateTime,
+  "endDate": endDateTime,
+  "location": {
+    "@type": "Place",
+    "name": event.location,
+    ...(event.locationUrl && { "url": event.locationUrl })
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": "The Ned Workshop",
+    "url": "https://nedworkshop.org"
+  },
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  ...(event.cost === 'FREE' ? {
+    "isAccessibleForFree": true
+  } : {
+    "isAccessibleForFree": false,
+    "offers": {
+      "@type": "Offer",
+      "price": event.cost,
+      "priceCurrency": "USD"
+    }
+  }),
+  ...(event.image && {
+    "image": `https://nedworkshop.org${eventImage}`
+  })
+};
+---
+
+<BaseLayout
+  title={event.title}
+  description={event.description.slice(0, 160)}
+  image={eventImage}
+  type="article"
+  jsonLd={eventJsonLd}
+>
+  <div class="max-w-5xl mx-auto px-6 py-16">
+    <!-- Back Link -->
+    <a href="/" class="inline-flex items-center text-amber-600 hover:text-amber-700 font-bold mb-8 transition-colors">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      Back to Events
+    </a>
+
+    <div class="card p-10">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-amber-600">{event.title}</h1>
+        <div class="md:text-right flex-shrink-0">
+          <p class="text-xl font-bold text-amber-600">{formatEventDate(event.date)}</p>
+          <p class="text-lg text-stone-600 font-medium">{event.startTime} - {event.endTime}</p>
+        </div>
+      </div>
+
+      <div class={event.image ? "flex flex-col md:flex-row gap-6 mb-6" : "mb-6"}>
+        {event.image && (
+          <img
+            src={eventImage}
+            alt={event.title}
+            class="rounded-xl w-48 h-48 object-cover border border-amber-200 flex-shrink-0"
+            width="192"
+            height="192"
+          />
+        )}
+        <div class="space-y-4 text-lg text-stone-600 font-medium">
+          {event.description.split('\n\n').map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+      </div>
+
+      <div class="border-t border-amber-200 pt-6 space-y-2 text-lg text-stone-600 font-medium">
+        <p>
+          <span class="font-bold text-amber-700">Location:</span>{' '}
+          {event.locationUrl ? (
+            <a
+              href={event.locationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-amber-600 hover:text-amber-700 underline decoration-amber-300 decoration-2 underline-offset-4 hover:decoration-amber-400 transition-colors duration-300"
+            >
+              {event.location}
+            </a>
+          ) : (
+            event.location
+          )}
+        </p>
+        <p>
+          <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+          {event.costNote && ` - ${event.costNote}`}
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

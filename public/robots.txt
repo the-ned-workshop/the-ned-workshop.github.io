@@ -1,0 +1,6 @@
+# robots.txt for nedworkshop.org
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://nedworkshop.org/sitemap-index.xml
