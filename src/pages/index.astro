@@ -25,56 +25,42 @@ const organizationJsonLd = {
 ---
 
 <BaseLayout title="Home" jsonLd={organizationJsonLd}>
-  <div class="max-w-5xl mx-auto px-6 py-16">
-    <!-- Hero Section -->
-    <div class="mb-20">
-      <div class="relative max-w-2xl mx-auto">
-        <div
-          aria-hidden="true"
-          class="hidden lg:flex flex-col gap-3 absolute top-1/2 text-4xl text-amber-500 select-none"
-          style="left: calc(-25vw + 168px); transform: translate(-50%, -50%);"
-        >
-          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-        </div>
-        <div
-          aria-hidden="true"
-          class="hidden lg:flex flex-col gap-3 absolute top-1/2 text-4xl text-amber-500 select-none"
-          style="right: calc(-25vw + 168px); transform: translate(50%, -50%);"
-        >
-          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-        </div>
-        <h1>
-          <img
-            src="/images/hero.jpg"
-            alt="The Ned Workshop"
-            width="1400"
-            height="1020"
-            fetchpriority="high"
-            class="w-full h-auto rounded-3xl shadow-xl"
-          />
-        </h1>
-      </div>
+  <!-- Hero Section -->
+  <section class="bg-amber-50">
+    <h1 class="block">
+      <img
+        src="/images/hero.jpg"
+        alt="The Ned Workshop"
+        width="2400"
+        height="1077"
+        fetchpriority="high"
+        class="w-full h-auto block"
+      />
+    </h1>
+    <div class="max-w-5xl mx-auto px-6 py-16">
       <p
-        class="text-center mt-8 text-5xl md:text-6xl text-amber-600 tracking-[0.15em] select-none"
+        class="text-center text-5xl md:text-6xl text-amber-600 tracking-[0.15em] select-none"
         style="font-family: 'Caprasimo', serif;"
-      >HOWDY</p>
+      ><span aria-hidden="true" class="text-amber-500 mr-4">★</span>HOWDY<span aria-hidden="true" class="text-amber-500 ml-4">★</span></p>
       <p class="text-center mt-4 text-xl md:text-2xl text-stone-600 font-semibold">
         Create, play, make, learn&mdash;together.
       </p>
     </div>
+  </section>
 
-    <!-- Upcoming Events Card -->
-    <div class="card p-10 mb-10">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-2 text-amber-600">
+  <!-- Upcoming Events Section -->
+  <section class="bg-amber-100 py-16">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-2 text-amber-700">
         Upcoming Events
       </h2>
-      <p class="text-stone-500 font-medium mb-6">
-        More to come as we build out the class content and find a venue(s).
+      <p class="text-stone-600 font-medium mb-6">
+        See you this summer at the Nederland Farmer's Market. Details to come soon!
       </p>
       <div class="space-y-6">
         {upcomingEvents.length > 0 ? (
           upcomingEvents.map((event) => (
-            <a href={`/events/${event.slug}`} class="block bg-amber-50 rounded-2xl p-6 border border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 group">
+            <a href={`/events/${event.slug}`} class="block bg-white/80 rounded-2xl p-6 border border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 group">
               <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
                 <h3 class="text-2xl font-bold text-amber-700 group-hover:text-amber-800">{event.title}</h3>
                 <div class="md:text-right">
@@ -105,7 +91,7 @@ const organizationJsonLd = {
           ))
         ) : (
           <div>
-            <p class="text-lg text-stone-500 italic font-medium">
+            <p class="text-lg text-stone-600 italic font-medium">
               No upcoming events scheduled.
             </p>
             <p class="text-lg text-stone-600 font-medium mt-4">
@@ -115,18 +101,17 @@ const organizationJsonLd = {
         )}
       </div>
     </div>
+  </section>
 
-    <!-- Contact Card -->
-    <div class="card p-10">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-amber-600">
+  <!-- Contact Section -->
+  <section class="bg-amber-200 py-16">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-amber-700">
         Say Hello!
       </h2>
-      <p class="text-xl text-stone-600 font-medium">
-        Reach out at
-        <a href="mailto:info@nedworkshop.org" class="font-bold text-amber-600 hover:text-amber-700 underline decoration-amber-300 decoration-2 underline-offset-4 hover:decoration-amber-400 transition-colors duration-300">
-          info@nedworkshop.org
-        </a>
+      <p class="text-xl text-stone-700 font-medium">
+        Please <a href="mailto:info@nedworkshop.org" class="font-bold text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300">reach out</a> with any questions! If you have ideas or suggestions for current or future class offerings, feel free to send those our way too!
       </p>
     </div>
-  </div>
+  </section>
 </BaseLayout>

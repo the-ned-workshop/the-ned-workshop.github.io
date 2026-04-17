@@ -74,21 +74,24 @@ const eventJsonLd = {
   type="article"
   jsonLd={eventJsonLd}
 >
-  <div class="max-w-5xl mx-auto px-6 py-16">
-    <!-- Back Link -->
-    <a href="/" class="inline-flex items-center text-amber-600 hover:text-amber-700 font-bold mb-8 transition-colors">
-      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-      </svg>
-      Back to Events
-    </a>
+  <section class="bg-amber-50 py-8">
+    <div class="max-w-5xl mx-auto px-6">
+      <a href="/" class="inline-flex items-center text-amber-700 hover:text-amber-800 font-bold transition-colors">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Events
+      </a>
+    </div>
+  </section>
 
-    <div class="card p-10">
+  <section class="bg-amber-100 py-16">
+    <div class="max-w-5xl mx-auto px-6">
       <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-amber-600">{event.title}</h1>
+        <h1 class="text-4xl md:text-5xl font-extrabold text-amber-700">{event.title}</h1>
         <div class="md:text-right flex-shrink-0">
-          <p class="text-xl font-bold text-amber-600">{formatEventDate(event.date)}</p>
-          <p class="text-lg text-stone-600 font-medium">{event.startTime} - {event.endTime}</p>
+          <p class="text-xl font-bold text-amber-700">{formatEventDate(event.date)}</p>
+          <p class="text-lg text-stone-700 font-medium">{event.startTime} - {event.endTime}</p>
         </div>
       </div>
 
@@ -102,22 +105,22 @@ const eventJsonLd = {
             height="192"
           />
         )}
-        <div class="space-y-4 text-lg text-stone-600 font-medium">
+        <div class="space-y-4 text-lg text-stone-700 font-medium">
           {event.description.split('\n\n').map((paragraph) => (
             <p>{paragraph}</p>
           ))}
         </div>
       </div>
 
-      <div class="border-t border-amber-200 pt-6 space-y-2 text-lg text-stone-600 font-medium">
+      <div class="border-t border-amber-300 pt-6 space-y-2 text-lg text-stone-700 font-medium">
         <p>
-          <span class="font-bold text-amber-700">Location:</span>{' '}
+          <span class="font-bold text-amber-800">Location:</span>{' '}
           {event.locationUrl ? (
             <a
               href={event.locationUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-amber-600 hover:text-amber-700 underline decoration-amber-300 decoration-2 underline-offset-4 hover:decoration-amber-400 transition-colors duration-300"
+              class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
             >
               {event.location}
             </a>
@@ -126,10 +129,10 @@ const eventJsonLd = {
           )}
         </p>
         <p>
-          <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+          <span class="font-bold text-amber-800">Cost:</span> {event.cost}
           {event.costNote && ` - ${event.costNote}`}
         </p>
       </div>
     </div>
-  </div>
+  </section>
 </BaseLayout>
