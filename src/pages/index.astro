@@ -27,10 +27,40 @@ const organizationJsonLd = {
 <BaseLayout title="Home" jsonLd={organizationJsonLd}>
   <div class="max-w-5xl mx-auto px-6 py-16">
     <!-- Hero Section -->
-    <div class="text-center mb-20">
-      <h1 class="text-5xl md:text-7xl font-extrabold leading-tight text-amber-600">
-        Welcome!
-      </h1>
+    <div class="mb-20">
+      <div class="relative max-w-2xl mx-auto">
+        <div
+          aria-hidden="true"
+          class="hidden lg:flex flex-col gap-3 absolute top-1/2 text-4xl text-amber-500 select-none"
+          style="left: calc(-25vw + 168px); transform: translate(-50%, -50%);"
+        >
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+        <div
+          aria-hidden="true"
+          class="hidden lg:flex flex-col gap-3 absolute top-1/2 text-4xl text-amber-500 select-none"
+          style="right: calc(-25vw + 168px); transform: translate(50%, -50%);"
+        >
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+        <h1>
+          <img
+            src="/images/hero.jpg"
+            alt="The Ned Workshop"
+            width="1400"
+            height="1020"
+            fetchpriority="high"
+            class="w-full h-auto rounded-3xl shadow-xl"
+          />
+        </h1>
+      </div>
+      <p
+        class="text-center mt-8 text-5xl md:text-6xl text-amber-600 tracking-[0.15em] select-none"
+        style="font-family: 'Caprasimo', serif;"
+      >HOWDY</p>
+      <p class="text-center mt-4 text-xl md:text-2xl text-stone-600 font-semibold">
+        Create, play, make, learn&mdash;together.
+      </p>
     </div>
 
     <!-- Upcoming Events Card -->
