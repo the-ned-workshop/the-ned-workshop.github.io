@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 
 const { event } = Astro.props;
 
-const eventImage = event.image ? event.image.replace(/^\/public/, '') : '/images/meta-image.png';
+const eventImage = event.image ? event.image.replace(/^\/public/, '') : '/images/meta-image.jpg';
 
 // Format date for JSON-LD (ISO 8601)
 const eventDateStr = event.date.toISOString().split('T')[0];

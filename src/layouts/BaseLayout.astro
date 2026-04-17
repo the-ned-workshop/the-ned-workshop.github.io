@@ -10,14 +10,15 @@ interface Props {
 const {
   title,
   description = 'Enable the community to repair and create through educational skill building workshops and access to tools.',
-  image = 'https://nedworkshop.org/images/meta-image.png',
+  image = '/images/meta-image.jpg',
   type = 'website',
   jsonLd
 } = Astro.props;
 
+const siteOrigin = import.meta.env.DEV ? Astro.url.origin : Astro.site;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const fullTitle = `${title} | The Ned Workshop`;
-const ogImage = image.startsWith('http') ? image : new URL(image, Astro.site).toString();
+const ogImage = image.startsWith('http') ? image : new URL(image, siteOrigin).toString();
 ---
 
 <!doctype html>
