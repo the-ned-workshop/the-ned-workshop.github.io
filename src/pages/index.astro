@@ -120,34 +120,33 @@ const organizationJsonLd = {
         {creations.map((creation) => (
           <article class="grid md:grid-cols-2 gap-8 items-center">
             {creation.images.length > 0 && (
-              <div class="creation-carousel relative w-4/5 mx-auto" data-carousel>
-                <div
-                  class="carousel-track flex overflow-x-auto snap-x snap-mandatory scroll-smooth aspect-square no-scrollbar"
-                  data-track
-                >
-                  {creation.images.map((src) => (
-                    <div class="snap-center shrink-0 w-full h-full flex items-center justify-center">
-                      <img
-                        src={src}
-                        alt={creation.title}
-                        class="w-full h-full object-cover rounded-full border border-amber-300 shadow-lg"
-                        loading="lazy"
-                      />
-                    </div>
-                  ))}
-                </div>
+              <div class="creation-carousel relative w-4/5 mx-auto aspect-square" data-carousel>
+                {creation.images.map((src, i) => (
+                  <div
+                    class="absolute inset-0 rounded-full overflow-hidden border border-amber-300 shadow-lg transition-opacity duration-300"
+                    data-slide
+                    style={`opacity: ${i === 0 ? 1 : 0}; z-index: ${i === 0 ? 2 : 1};`}
+                  >
+                    <img
+                      src={src}
+                      alt={creation.title}
+                      class="w-full h-full object-cover block"
+                      loading={i === 0 ? undefined : 'lazy'}
+                    />
+                  </div>
+                ))}
                 {creation.images.length > 1 && (
                   <>
                     <button
                       type="button"
                       aria-label="Previous image"
-                      class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-amber-700 text-2xl font-bold shadow-md flex items-center justify-center transition"
+                      class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-amber-700 text-2xl font-bold shadow-md flex items-center justify-center transition z-10"
                       data-prev
                     >&lsaquo;</button>
                     <button
                       type="button"
                       aria-label="Next image"
-                      class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-amber-700 text-2xl font-bold shadow-md flex items-center justify-center transition"
+                      class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-amber-700 text-2xl font-bold shadow-md flex items-center justify-center transition z-10"
                       data-next
                     >&rsaquo;</button>
                   </>
@@ -330,15 +329,21 @@ const organizationJsonLd = {
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((carousel) => {
-    const track = carousel.querySelector<HTMLElement>('[data-track]');
+    const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-slide]'));
     const prev = carousel.querySelector<HTMLButtonElement>('[data-prev]');
     const next = carousel.querySelector<HTMLButtonElement>('[data-next]');
-    if (!track) return;
-    prev?.addEventListener('click', () => {
-      track.scrollBy({ left: -track.clientWidth, behavior: 'smooth' });
-    });
-    next?.addEventListener('click', () => {
-      track.scrollBy({ left: track.clientWidth, behavior: 'smooth' });
-    });
+    if (slides.length === 0) return;
+    let index = 0;
+    const show = (newIndex: number) => {
+      const len = slides.length;
+      const wrapped = ((newIndex % len) + len) % len;
+      slides.forEach((slide, i) => {
+        slide.style.opacity = i === wrapped ? '1' : '0';
+        slide.style.zIndex = i === wrapped ? '2' : '1';
+      });
+      index = wrapped;
+    };
+    prev?.addEventListener('click', () => show(index - 1));
+    next?.addEventListener('click', () => show(index + 1));
   });
 </script>
