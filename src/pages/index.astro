@@ -12,26 +12,9 @@ const creations = await getCreations();
 function formatCreationDate(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
-
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "The Ned Workshop",
-  "description": "Enable the community to repair and create through educational skill building workshops and access to tools.",
-  "url": "https://nedworkshop.org",
-  "logo": "https://nedworkshop.org/favicon.svg",
-  "email": "info@nedworkshop.org",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Nederland",
-    "addressRegion": "CO",
-    "addressCountry": "US"
-  },
-  "sameAs": []
-};
 ---
 
-<BaseLayout title="The Ned Workshop — Tool Library & Workshops in Nederland, CO" jsonLd={organizationJsonLd}>
+<BaseLayout title="The Ned Workshop — Tool Library & Workshops in Nederland, CO">
   <!-- Hero Section -->
   <section class="bg-amber-50">
     <h1 class="sr-only">The Ned Workshop &mdash; Community Tool Library &amp; Skill-Building Workshops in Nederland, Colorado</h1>

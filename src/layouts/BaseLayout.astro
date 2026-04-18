@@ -19,6 +19,23 @@ const siteOrigin = import.meta.env.DEV ? Astro.url.origin : Astro.site;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const fullTitle = title.includes('The Ned Workshop') ? title : `${title} | The Ned Workshop`;
 const ogImage = image.startsWith('http') ? image : new URL(image, siteOrigin).toString();
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "The Ned Workshop",
+  "description": "Enable the community to repair and create through educational skill building workshops and access to tools.",
+  "url": "https://nedworkshop.org",
+  "logo": "https://nedworkshop.org/favicon.svg",
+  "email": "info@nedworkshop.org",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Nederland",
+    "addressRegion": "CO",
+    "addressCountry": "US"
+  },
+  "sameAs": []
+};
 ---
 
 <!doctype html>
@@ -49,6 +66,7 @@ const ogImage = image.startsWith('http') ? image : new URL(image, siteOrigin).to
     <title>{fullTitle}</title>
 
     <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
     {jsonLd && (
       <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     )}
