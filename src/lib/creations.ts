@@ -1,8 +1,13 @@
+export interface CreationImage {
+  src: string;
+  alt: string;
+}
+
 export interface Creation {
   slug: string;
   title: string;
   date: Date;
-  images: string[];
+  images: CreationImage[];
   description: string;
 }
 
@@ -34,14 +39,21 @@ export async function getCreations(): Promise<Creation[]> {
       }
     }
 
-    const images = (data.images ?? '')
+    const title = data.title ?? '';
+    const images: CreationImage[] = (data.images ?? '')
       .split(',')
-      .map((s) => s.trim().replace(/^\/public/, ''))
-      .filter(Boolean);
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .map((entry) => {
+        const [rawSrc, ...altParts] = entry.split('|');
+        const src = rawSrc.trim().replace(/^\/public/, '');
+        const alt = altParts.join('|').trim() || title;
+        return { src, alt };
+      });
 
     creations.push({
       slug,
-      title: data.title ?? '',
+      title,
       date: new Date(data.date + 'T12:00:00'),
       images,
       description,

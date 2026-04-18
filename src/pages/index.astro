@@ -103,15 +103,15 @@ function formatCreationDate(date: Date): string {
           <article class="grid md:grid-cols-2 gap-8 items-center">
             {creation.images.length > 0 && (
               <div class="creation-carousel relative w-4/5 mx-auto aspect-square" data-carousel>
-                {creation.images.map((src, i) => (
+                {creation.images.map((image, i) => (
                   <div
                     class="absolute inset-0 rounded-full overflow-hidden border border-amber-300 shadow-lg transition-opacity duration-300"
                     data-slide
                     style={`opacity: ${i === 0 ? 1 : 0}; z-index: ${i === 0 ? 2 : 1};`}
                   >
                     <img
-                      src={src}
-                      alt={creation.title}
+                      src={image.src}
+                      alt={image.alt}
                       class="w-full h-full object-cover block"
                       loading={i === 0 ? undefined : 'lazy'}
                     />
