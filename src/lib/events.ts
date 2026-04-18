@@ -10,6 +10,7 @@ export interface Event {
   costNote?: string;
   image?: string;
   description: string;
+  rsvpWidgetId?: string;
 }
 
 export async function getEvents(): Promise<Event[]> {
@@ -55,6 +56,7 @@ export async function getEvents(): Promise<Event[]> {
       costNote: data.costNote,
       image: data.image,
       description,
+      rsvpWidgetId: data.rsvpWidgetId,
     });
   }
 

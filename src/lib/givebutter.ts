@@ -1,0 +1,2 @@
+export const GIVEBUTTER_ACCOUNT_ID = 'KrTAfPoU5LGxf8jV';
+export const GIVEBUTTER_NEWSLETTER_WIDGET_ID = 'pA7760';

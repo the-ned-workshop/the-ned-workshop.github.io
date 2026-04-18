@@ -132,6 +132,11 @@ const eventJsonLd = {
           <span class="font-bold text-amber-800">Cost:</span> {event.cost}
           {event.costNote && ` - ${event.costNote}`}
         </p>
+        {event.rsvpWidgetId && (
+          <div class="pt-4">
+            <givebutter-widget id={event.rsvpWidgetId}></givebutter-widget>
+          </div>
+        )}
       </div>
     </div>
   </section>
