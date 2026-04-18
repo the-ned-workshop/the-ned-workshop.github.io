@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const description = "The page you're looking for isn't here. Head back to The Ned Workshop home page to explore classes, the tool library, and community events.";
+---
+
+<BaseLayout title="Page Not Found" description={description}>
+  <section class="bg-amber-50 py-10">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-amber-700">
+        Page Not Found
+      </h1>
+    </div>
+  </section>
+
+  <section class="bg-amber-100 py-16">
+    <div class="max-w-3xl mx-auto px-6 text-center">
+      <p class="text-xl md:text-2xl text-stone-700 leading-relaxed font-medium mb-8">
+        We couldn&rsquo;t find the page you were looking for. It may have moved, or the link might be out of date.
+      </p>
+      <p class="text-lg text-stone-700 font-medium">
+        Try the
+        <a href="/" class="font-bold text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300">home page</a>,
+        browse the
+        <a href="/tools" class="font-bold text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300">Tool Library</a>,
+        or
+        <a href="/about" class="font-bold text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300">learn about us</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
