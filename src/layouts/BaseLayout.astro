@@ -17,7 +17,7 @@ const {
 
 const siteOrigin = import.meta.env.DEV ? Astro.url.origin : Astro.site;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
-const fullTitle = title === 'The Ned Workshop' ? title : `${title} | The Ned Workshop`;
+const fullTitle = title.includes('The Ned Workshop') ? title : `${title} | The Ned Workshop`;
 const ogImage = image.startsWith('http') ? image : new URL(image, siteOrigin).toString();
 ---
 
