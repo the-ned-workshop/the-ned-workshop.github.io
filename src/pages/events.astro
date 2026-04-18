@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEvents, formatEventDate, formatEventDateWithYear } from '../lib/events';
+
+const events = await getEvents();
+const now = new Date();
+const upcomingEvents = events.filter((e) => e.date >= now);
+const pastEvents = events.filter((e) => e.date < now).sort((a, b) => b.date.getTime() - a.date.getTime());
+
+const description = "Upcoming classes, open workshop hours, and a history of past events at The Ned Workshop in Nederland, Colorado.";
+---
+
+<BaseLayout title="Events" description={description}>
+  <section class="bg-amber-50 py-10">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-amber-700">Events</h1>
+      <p class="mt-4 text-xl md:text-2xl text-stone-600 font-semibold">
+        Classes, open workshop hours, and community gatherings.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-amber-100 py-16">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-2 text-amber-700">
+        Upcoming
+      </h2>
+      <p class="text-stone-600 font-medium mb-6">
+        See you this summer at the Nederland Farmer&rsquo;s Market. Details to come soon!
+      </p>
+      <div class="space-y-6">
+        {upcomingEvents.length > 0 ? (
+          upcomingEvents.map((event) => (
+            <a
+              href={`/events/${event.slug}`}
+              class="block bg-white/80 rounded-2xl p-6 border border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 group"
+            >
+              <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+                <h3 class="text-2xl font-bold text-amber-700 group-hover:text-amber-800">{event.title}</h3>
+                <div class="md:text-right">
+                  <p class="text-lg font-bold text-amber-600">{formatEventDate(event.date)}</p>
+                  <p class="text-stone-600 font-medium">{event.startTime} - {event.endTime}</p>
+                </div>
+              </div>
+              <div class={event.image ? "flex flex-col md:flex-row gap-4" : ""}>
+                {event.image && (
+                  <img
+                    src={event.image.replace(/^\/public/, '')}
+                    alt={event.title}
+                    class="rounded-xl w-32 h-32 object-cover border border-amber-200 flex-shrink-0"
+                    width="128"
+                    height="128"
+                    loading="lazy"
+                  />
+                )}
+                <div class="space-y-3 text-stone-600 font-medium">
+                  {event.description.split('\n\n').map((paragraph) => (
+                    <p>{paragraph}</p>
+                  ))}
+                  <div class="pt-3 border-t border-amber-200">
+                    <p>
+                      <span class="font-bold text-amber-700">Location:</span> {event.location}
+                    </p>
+                    <p>
+                      <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+                      {event.costNote && ` - ${event.costNote}`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))
+        ) : (
+          <div class="bg-white/60 rounded-2xl p-6 border border-amber-200">
+            <p class="text-lg text-stone-600 italic font-medium">
+              No upcoming events scheduled.
+            </p>
+            <p class="text-lg text-stone-600 font-medium mt-4">
+              Check back soon for updates on classes, open workshop hours, and community events.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-amber-200 py-16">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-amber-700">
+        Past Events
+      </h2>
+      {pastEvents.length > 0 ? (
+        <div class="space-y-4">
+          {pastEvents.map((event) => (
+            <a
+              href={`/events/${event.slug}`}
+              class="block bg-white/70 rounded-2xl p-5 border border-amber-300 hover:border-amber-500 hover:bg-white/90 transition-all duration-300 group"
+            >
+              <div class="flex items-center gap-4">
+                {event.image ? (
+                  <img
+                    src={event.image.replace(/^\/public/, '')}
+                    alt={event.title}
+                    class="rounded-lg w-20 h-20 object-cover border border-amber-200 flex-shrink-0"
+                    width="80"
+                    height="80"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div class="w-20 h-20 rounded-lg bg-amber-100 border border-amber-200 flex-shrink-0" aria-hidden="true"></div>
+                )}
+                <div class="flex-1 min-w-0">
+                  <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4">
+                    <h3 class="text-xl md:text-2xl font-extrabold text-amber-700 group-hover:text-amber-800 truncate">
+                      {event.title}
+                    </h3>
+                    <p class="text-base font-bold text-amber-600 flex-shrink-0">
+                      {formatEventDateWithYear(event.date)}
+                    </p>
+                  </div>
+                  <p class="text-stone-600 font-medium mt-1">
+                    <span class="font-bold text-amber-700">Location:</span> {event.location}
+                  </p>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="text-lg text-stone-600 italic font-medium">
+          No past events yet &mdash; our first event is just around the corner.
+        </p>
+      )}
+    </div>
+  </section>
+</BaseLayout>
