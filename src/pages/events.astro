@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import EventsCallout from '../components/EventsCallout.astro';
+import NoUpcomingEvents from '../components/NoUpcomingEvents.astro';
 import { getEvents, formatEventDate, formatEventDateWithYear } from '../lib/events';
 
 const events = await getEvents();
@@ -25,9 +27,7 @@ const description = "Upcoming classes, open workshop hours, and a history of pas
       <h2 class="text-3xl md:text-4xl font-extrabold mb-2 text-amber-700">
         Upcoming
       </h2>
-      <p class="text-stone-600 font-medium mb-6">
-        See you this summer at the Nederland Farmer&rsquo;s Market. Details to come soon!
-      </p>
+      <EventsCallout />
       <div class="space-y-6">
         {upcomingEvents.length > 0 ? (
           upcomingEvents.map((event) => (
@@ -71,14 +71,7 @@ const description = "Upcoming classes, open workshop hours, and a history of pas
             </a>
           ))
         ) : (
-          <div class="bg-white/60 rounded-2xl p-6 border border-amber-200">
-            <p class="text-lg text-stone-600 italic font-medium">
-              No upcoming events scheduled.
-            </p>
-            <p class="text-lg text-stone-600 font-medium mt-4">
-              Check back soon for updates on classes, open workshop hours, and community events.
-            </p>
-          </div>
+          <NoUpcomingEvents />
         )}
       </div>
     </div>
