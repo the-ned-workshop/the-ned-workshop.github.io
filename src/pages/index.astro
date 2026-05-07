@@ -6,7 +6,7 @@ import { getCreations } from '../lib/creations';
 
 const events = await getEvents();
 const now = new Date();
-const upcomingEvents = events.filter(e => e.date >= now);
+const upcomingEvents = events.filter(e => e.date >= now).slice(0, 2);
 
 const creations = await getCreations();
 
