@@ -1,3 +1,8 @@
+export interface EventImage {
+  src: string;
+  alt: string;
+}
+
 export interface Event {
   slug: string;
   title: string;
@@ -9,6 +14,7 @@ export interface Event {
   cost: string;
   costNote?: string;
   image?: string;
+  images: EventImage[];
   description: string;
   rsvpWidgetId?: string;
 }
@@ -44,9 +50,21 @@ export async function getEvents(): Promise<Event[]> {
       }
     }
 
+    const title = data.title ?? '';
+    const images: EventImage[] = (data.images ?? '')
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .map((entry) => {
+        const [rawSrc, ...altParts] = entry.split('|');
+        const src = rawSrc.trim().replace(/^\/public/, '');
+        const alt = altParts.join('|').trim() || title;
+        return { src, alt };
+      });
+
     events.push({
       slug,
-      title: data.title ?? '',
+      title,
       date: new Date(data.date + 'T12:00:00'),
       startTime: data.startTime ?? '',
       endTime: data.endTime ?? '',
@@ -55,6 +73,7 @@ export async function getEvents(): Promise<Event[]> {
       cost: data.cost ?? '',
       costNote: data.costNote,
       image: data.image,
+      images,
       description,
       rsvpWidgetId: data.rsvpWidgetId,
     });

@@ -1,18 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NoUpcomingEvents from '../components/NoUpcomingEvents.astro';
-import { getEvents, formatEventDate } from '../lib/events';
-import { getCreations } from '../lib/creations';
+import { getEvents, formatEventDate, formatEventDateWithYear } from '../lib/events';
 
 const events = await getEvents();
 const now = new Date();
 const upcomingEvents = events.filter(e => e.date >= now).slice(0, 2);
-
-const creations = await getCreations();
-
-function formatCreationDate(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-}
+const pastEvents = events
+  .filter(e => e.date < now)
+  .sort((a, b) => b.date.getTime() - a.date.getTime())
+  .slice(0, 2);
 ---
 
 <BaseLayout title="The Ned Workshop — Tool Library & Workshops in Nederland, CO">
@@ -94,62 +91,58 @@ function formatCreationDate(date: Date): string {
     </div>
   </section>
 
-  <!-- Recent Creations Section -->
+  <!-- Past Events Section -->
   <section class="bg-amber-200 py-16">
     <div class="max-w-5xl mx-auto px-6">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-8 text-amber-700">
-        Recent Creations
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-amber-700">
+        Past Events
       </h2>
-      <div class="space-y-12">
-        {creations.map((creation) => (
-          <article class="grid md:grid-cols-2 gap-8 items-center">
-            {creation.images.length > 0 && (
-              <div class="creation-carousel relative w-4/5 mx-auto aspect-square" data-carousel>
-                {creation.images.map((image, i) => (
-                  <div
-                    class="absolute inset-0 rounded-full overflow-hidden border border-amber-300 shadow-lg transition-opacity duration-300"
-                    data-slide
-                    style={`opacity: ${i === 0 ? 1 : 0}; z-index: ${i === 0 ? 2 : 1};`}
-                  >
-                    <img
-                      src={image.src}
-                      alt={image.alt}
-                      class="w-full h-full object-cover block"
-                      loading={i === 0 ? undefined : 'lazy'}
-                    />
-                  </div>
-                ))}
-                {creation.images.length > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      aria-label="Previous image"
-                      class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-amber-700 text-2xl font-bold shadow-md flex items-center justify-center transition z-10"
-                      data-prev
-                    >&lsaquo;</button>
-                    <button
-                      type="button"
-                      aria-label="Next image"
-                      class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-amber-700 text-2xl font-bold shadow-md flex items-center justify-center transition z-10"
-                      data-next
-                    >&rsaquo;</button>
-                  </>
-                )}
-              </div>
-            )}
-            <div class="text-lg text-stone-700 font-medium leading-relaxed">
-              <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 mb-4">
-                <h3 class="text-2xl md:text-3xl font-extrabold text-amber-700">{creation.title}</h3>
-                <p class="text-lg font-bold text-amber-600">{formatCreationDate(creation.date)}</p>
-              </div>
-              <div class="space-y-3">
-                {creation.description.split('\n\n').map((paragraph) => (
-                  <p>{paragraph}</p>
-                ))}
+      <div class="space-y-4">
+        {pastEvents.map((event) => (
+          <a
+            href={`/events/${event.slug}`}
+            class="block bg-white/70 rounded-2xl p-5 border border-amber-300 hover:border-amber-500 hover:bg-white/90 transition-all duration-300 group"
+          >
+            <div class="flex items-center gap-4">
+              {event.image ? (
+                <img
+                  src={event.image.replace(/^\/public/, '')}
+                  alt={event.title}
+                  class="rounded-lg w-20 h-20 object-cover border border-amber-200 flex-shrink-0"
+                  width="80"
+                  height="80"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="w-20 h-20 rounded-lg bg-amber-100 border border-amber-200 flex-shrink-0" aria-hidden="true"></div>
+              )}
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4">
+                  <h3 class="text-xl md:text-2xl font-extrabold text-amber-700 group-hover:text-amber-800 truncate">
+                    {event.title}
+                  </h3>
+                  <p class="text-base font-bold text-amber-600 flex-shrink-0">
+                    {formatEventDateWithYear(event.date)}
+                  </p>
+                </div>
+                <p class="text-stone-600 font-medium mt-1">
+                  <span class="font-bold text-amber-700">Location:</span> {event.location}
+                </p>
               </div>
             </div>
-          </article>
+          </a>
         ))}
+      </div>
+      <div class="mt-8">
+        <a
+          href="/events"
+          class="inline-flex items-center font-bold text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
+        >
+          View all events
+          <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
       </div>
     </div>
   </section>
@@ -306,28 +299,3 @@ function formatCreationDate(date: Date): string {
   </section>
 </BaseLayout>
 
-<style>
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-</style>
-
-<script>
-  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((carousel) => {
-    const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-slide]'));
-    const prev = carousel.querySelector<HTMLButtonElement>('[data-prev]');
-    const next = carousel.querySelector<HTMLButtonElement>('[data-next]');
-    if (slides.length === 0) return;
-    let index = 0;
-    const show = (newIndex: number) => {
-      const len = slides.length;
-      const wrapped = ((newIndex % len) + len) % len;
-      slides.forEach((slide, i) => {
-        slide.style.opacity = i === wrapped ? '1' : '0';
-        slide.style.zIndex = i === wrapped ? '2' : '1';
-      });
-      index = wrapped;
-    };
-    prev?.addEventListener('click', () => show(index - 1));
-    next?.addEventListener('click', () => show(index + 1));
-  });
-</script>

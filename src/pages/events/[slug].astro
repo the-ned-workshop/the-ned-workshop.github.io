@@ -138,6 +138,60 @@ const eventJsonLd = {
           </div>
         )}
       </div>
+
+      {event.images.length > 0 && (
+        <div class="mt-10">
+          <div class="relative max-w-xl mx-auto aspect-square rounded-2xl overflow-hidden border border-amber-300 shadow-lg" data-carousel>
+            {event.images.map((image, i) => (
+              <img
+                src={image.src}
+                alt={image.alt}
+                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                style={`opacity: ${i === 0 ? 1 : 0}; z-index: ${i === 0 ? 2 : 1};`}
+                data-slide
+                loading={i === 0 ? undefined : 'lazy'}
+              />
+            ))}
+            {event.images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Previous image"
+                  class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-amber-700 text-2xl font-bold shadow-md flex items-center justify-center transition z-10"
+                  data-prev
+                >&lsaquo;</button>
+                <button
+                  type="button"
+                  aria-label="Next image"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-amber-700 text-2xl font-bold shadow-md flex items-center justify-center transition z-10"
+                  data-next
+                >&rsaquo;</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((carousel) => {
+    const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-slide]'));
+    const prev = carousel.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = carousel.querySelector<HTMLButtonElement>('[data-next]');
+    if (slides.length === 0) return;
+    let index = 0;
+    const show = (newIndex: number) => {
+      const len = slides.length;
+      const wrapped = ((newIndex % len) + len) % len;
+      slides.forEach((slide, i) => {
+        slide.style.opacity = i === wrapped ? '1' : '0';
+        slide.style.zIndex = i === wrapped ? '2' : '1';
+      });
+      index = wrapped;
+    };
+    prev?.addEventListener('click', () => show(index - 1));
+    next?.addEventListener('click', () => show(index + 1));
+  });
+</script>
