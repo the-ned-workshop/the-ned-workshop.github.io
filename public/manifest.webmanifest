@@ -1,0 +1,16 @@
+{
+  "name": "The Ned Workshop",
+  "short_name": "Ned Workshop",
+  "description": "Community Tool Library & Skill-Building Workshops in Nederland, CO",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffbeb",
+  "theme_color": "#fffbeb",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
