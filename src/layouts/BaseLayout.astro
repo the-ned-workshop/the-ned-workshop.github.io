@@ -93,13 +93,15 @@ const organizationJsonLd = {
   <body class="min-h-screen flex flex-col">
     <header class="bg-white/80 backdrop-blur-md border-b-2 border-amber-200 sticky top-0 z-50">
       <nav class="max-w-5xl mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-          <a href="/" class="group">
-            <span class="text-2xl font-extrabold text-amber-600 group-hover:text-amber-700 transition-colors duration-300">
+        <div class="flex items-center justify-between gap-3">
+          <a href="/" class="group min-w-0">
+            <span class="text-xl md:text-2xl font-extrabold text-amber-600 group-hover:text-amber-700 transition-colors duration-300 whitespace-nowrap">
               The Ned Workshop
             </span>
           </a>
-          <div class="flex items-center gap-6">
+
+          <!-- Desktop nav -->
+          <div class="hidden md:flex items-center gap-6">
             <a href="/" class="text-stone-600 hover:text-amber-600 transition-colors font-bold">
               Home
             </a>
@@ -122,8 +124,71 @@ const organizationJsonLd = {
               Donate
             </a>
           </div>
+
+          <!-- Mobile menu toggle -->
+          <button
+            id="mobile-menu-toggle"
+            type="button"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            class="md:hidden flex-shrink-0 p-2 -mr-2 text-amber-700 hover:text-amber-800 transition-colors"
+          >
+            <svg id="mobile-menu-icon-open" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="4" x2="20" y1="6" y2="6"></line>
+              <line x1="4" x2="20" y1="12" y2="12"></line>
+              <line x1="4" x2="20" y1="18" y2="18"></line>
+            </svg>
+            <svg id="mobile-menu-icon-close" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="hidden" aria-hidden="true">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mobile menu panel -->
+        <div id="mobile-menu" class="md:hidden hidden flex-col gap-1 pt-4 mt-4 border-t border-amber-200">
+          <a href="/" class="text-stone-700 hover:text-amber-600 hover:bg-amber-50 transition-colors font-bold py-3 px-2 rounded">
+            Home
+          </a>
+          <a href="/events" class="text-stone-700 hover:text-amber-600 hover:bg-amber-50 transition-colors font-bold py-3 px-2 rounded">
+            Events
+          </a>
+          <a href="/tools" class="text-stone-700 hover:text-amber-600 hover:bg-amber-50 transition-colors font-bold py-3 px-2 rounded">
+            Tool Library
+          </a>
+          <a href="/about" class="text-stone-700 hover:text-amber-600 hover:bg-amber-50 transition-colors font-bold py-3 px-2 rounded">
+            About
+          </a>
+          <a
+            href="https://givebutter.com/f0z0Bm"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center justify-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-extrabold uppercase tracking-wider text-sm px-4 py-3 mt-1 rounded-full shadow-md transition-all duration-300"
+          >
+            <span aria-hidden="true">★</span>
+            Donate
+          </a>
         </div>
       </nav>
+      <script is:inline>
+        (() => {
+          const btn = document.getElementById('mobile-menu-toggle');
+          const menu = document.getElementById('mobile-menu');
+          const iconOpen = document.getElementById('mobile-menu-icon-open');
+          const iconClose = document.getElementById('mobile-menu-icon-close');
+          if (!btn || !menu) return;
+          btn.addEventListener('click', () => {
+            const isOpen = !menu.classList.contains('hidden');
+            menu.classList.toggle('hidden', isOpen);
+            menu.classList.toggle('flex', !isOpen);
+            iconOpen.classList.toggle('hidden', !isOpen);
+            iconClose.classList.toggle('hidden', isOpen);
+            btn.setAttribute('aria-expanded', String(!isOpen));
+            btn.setAttribute('aria-label', isOpen ? 'Open menu' : 'Close menu');
+          });
+        })();
+      </script>
     </header>
 
     <main class="flex-1">
