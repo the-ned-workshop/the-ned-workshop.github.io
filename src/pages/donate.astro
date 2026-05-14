@@ -1,0 +1,19 @@
+---
+const target = 'https://givebutter.com/f0z0Bm';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="canonical" href={target} />
+    <meta name="robots" content="noindex" />
+    <title>Donate | The Ned Workshop</title>
+    <script is:inline define:vars={{ target }}>
+      window.location.replace(target);
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to <a href={target}>{target}</a>&hellip;</p>
+  </body>
+</html>
