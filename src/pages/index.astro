@@ -101,24 +101,24 @@ const pastEvents = events
         {pastEvents.map((event) => (
           <a
             href={`/events/${event.slug}`}
-            class="block bg-white/70 rounded-2xl p-5 border border-amber-300 hover:border-amber-500 hover:bg-white/90 transition-all duration-300 group"
+            class="block bg-white/70 rounded-2xl border border-amber-300 hover:border-amber-500 hover:bg-white/90 transition-all duration-300 group overflow-hidden"
           >
-            <div class="flex items-center gap-4">
+            <div class="flex flex-col md:flex-row md:items-center md:gap-4 md:p-5">
               {event.image ? (
                 <img
                   src={event.image.replace(/^\/public/, '')}
                   alt={event.title}
-                  class="rounded-lg w-20 h-20 object-cover border border-amber-200 flex-shrink-0"
+                  class="w-full h-44 object-cover md:w-20 md:h-20 md:rounded-lg md:border md:border-amber-200 md:flex-shrink-0"
                   width="80"
                   height="80"
                   loading="lazy"
                 />
               ) : (
-                <div class="w-20 h-20 rounded-lg bg-amber-100 border border-amber-200 flex-shrink-0" aria-hidden="true"></div>
+                <div class="hidden md:block w-20 h-20 rounded-lg bg-amber-100 border border-amber-200 flex-shrink-0" aria-hidden="true"></div>
               )}
-              <div class="flex-1 min-w-0">
+              <div class="flex-1 min-w-0 p-5 md:p-0">
                 <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4">
-                  <h3 class="text-xl md:text-2xl font-extrabold text-amber-700 group-hover:text-amber-800 truncate">
+                  <h3 class="text-xl md:text-2xl font-extrabold text-amber-700 group-hover:text-amber-800 line-clamp-2">
                     {event.title}
                   </h3>
                   <p class="text-base font-bold text-amber-600 flex-shrink-0">
