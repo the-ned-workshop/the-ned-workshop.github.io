@@ -3,7 +3,7 @@ title: Wooden Stool Workshop
 date: 2026-06-21
 startTime: "10:00 AM"
 endTime: "2:00 PM"
-location: Nederland Farmer's Market
+location: Nederland Farmers Market
 locationUrl: https://www.google.com/maps/search/?api=1&query=80+E+2nd+St+Nederland+CO+80466
 cost: FREE
 image: /public/images/events/2026-06-21-farmers-market/2.jpg
@@ -16,6 +16,6 @@ All of ¾ inch plywood was purchased second-hand at Resource Central in Boulder.
 
 This workshop is designed for all ages, sizes, and genders.
 
-Come create with us at the Farmer's Market on June 21st from 10am - 2pm!
+Come create with us at the Farmers Market on June 21st from 10am - 2pm!
 
 Making is free, donations appreciated when possible.

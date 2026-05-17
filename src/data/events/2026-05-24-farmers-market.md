@@ -3,7 +3,7 @@ title: Tutu and Magic Wand Workshop
 date: 2026-05-24
 startTime: "10:00 AM"
 endTime: "2:00 PM"
-location: Nederland Farmer's Market
+location: Nederland Farmers Market
 locationUrl: https://www.google.com/maps/search/?api=1&query=80+E+2nd+St+Nederland+CO+80466
 cost: FREE
 image: /public/images/events/2026-05-24-farmers-market/3.jpg
@@ -16,6 +16,6 @@ All of the tulle and supplies used in this workshop were donated or purchased se
 
 This workshop is designed for all ages, sizes, and genders.
 
-Come create with us at the Farmer's Market on May 24th from 10am - 2pm!
+Come create with us at the Farmers Market on May 24th from 10am - 2pm!
 
 Making is free, donations appreciated when possible.
