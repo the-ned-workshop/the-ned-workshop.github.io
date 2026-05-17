@@ -87,62 +87,58 @@ const eventJsonLd = {
 
   <section class="bg-amber-100 py-16">
     <div class="max-w-5xl mx-auto px-6">
-      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-amber-700">{event.title}</h1>
-        <div class="md:text-right flex-shrink-0">
-          <p class="text-xl font-bold text-amber-700">{formatEventDate(event.date)}</p>
-          <p class="text-lg text-stone-700 font-medium">{event.startTime} - {event.endTime}</p>
+      <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-5 md:gap-6 mb-6">
+        <div class="min-w-0 space-y-1">
+          <h1 class="text-3xl md:text-4xl font-extrabold text-amber-700">{event.title}</h1>
+          <p class="text-lg text-stone-700 font-medium">
+            <span class="font-bold text-amber-800">Time:</span> {formatEventDate(event.date)}, {event.startTime} – {event.endTime}
+          </p>
+          <p class="text-lg text-stone-700 font-medium">
+            <span class="font-bold text-amber-800">Location:</span>{' '}
+            {event.locationUrl ? (
+              <a
+                href={event.locationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
+              >
+                {event.location}
+              </a>
+            ) : (
+              event.location
+            )}
+          </p>
+          <p class="text-lg text-stone-700 font-medium">
+            <span class="font-bold text-amber-800">Cost:</span> {event.cost}
+            {event.costNote && ` — ${event.costNote}`}
+          </p>
         </div>
-      </div>
-
-      <div class="border-t border-b border-amber-300 py-6 mb-6 space-y-2 text-lg text-stone-700 font-medium">
-        <p>
-          <span class="font-bold text-amber-800">Location:</span>{' '}
-          {event.locationUrl ? (
-            <a
-              href={event.locationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
-            >
-              {event.location}
-            </a>
-          ) : (
-            event.location
-          )}
-        </p>
-        <p>
-          <span class="font-bold text-amber-800">Cost:</span> {event.cost}
-          {event.costNote && ` - ${event.costNote}`}
-        </p>
-      </div>
-
-      <div class={event.image ? "flex flex-col md:flex-row gap-6 mb-6" : "mb-6"}>
         {event.image && (
-          <img
-            src={eventImage}
-            alt={event.title}
-            class="rounded-xl w-48 h-48 object-cover border border-amber-200 flex-shrink-0"
-            width="192"
-            height="192"
-          />
+          <div class="h-full aspect-square rounded-xl overflow-hidden border-2 border-amber-200">
+            <img
+              src={eventImage}
+              alt={event.title}
+              class="block w-full h-full object-cover"
+            />
+          </div>
         )}
-        <div class="space-y-4 text-lg text-stone-700 font-medium">
-          {event.description.split('\n\n').map((paragraph) => (
-            <p>
-              {parseDescriptionParagraph(paragraph).map((node) => (
-                node.type === 'text' ? node.value : (
-                  <a
-                    href={node.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
-                  >{node.label}</a>
-                )
-              ))}
-            </p>
-          ))}
-        </div>
+      </div>
+
+      <div class="border-t border-amber-300 pt-6 space-y-4 text-lg text-stone-700 font-medium mb-6">
+        {event.description.split('\n\n').map((paragraph) => (
+          <p>
+            {parseDescriptionParagraph(paragraph).map((node) => (
+              node.type === 'text' ? node.value : (
+                <a
+                  href={node.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
+                >{node.label}</a>
+              )
+            ))}
+          </p>
+        ))}
       </div>
 
       {event.rsvpWidgetId && (

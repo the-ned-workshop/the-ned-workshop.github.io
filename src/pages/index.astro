@@ -45,31 +45,35 @@ const pastEvents = events
         {upcomingEvents.length > 0 ? (
           upcomingEvents.map((event) => (
             <a href={`/events/${event.slug}`} class="block bg-white/80 rounded-2xl p-6 border border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 group">
-              <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
-                <h3 class="text-2xl font-bold text-amber-700 group-hover:text-amber-800">{event.title}</h3>
-                <div class="md:text-right">
-                  <p class="text-lg font-bold text-amber-600">{formatEventDate(event.date)}</p>
-                  <p class="text-stone-600 font-medium">{event.startTime} - {event.endTime}</p>
+              <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-4 mb-4">
+                <div class="min-w-0 space-y-0.5">
+                  <h3 class="text-2xl font-bold text-amber-700 group-hover:text-amber-800">{event.title}</h3>
+                  <p class="text-stone-600 font-medium">
+                    <span class="font-bold text-amber-700">Time:</span> {formatEventDate(event.date)}, {event.startTime} – {event.endTime}
+                  </p>
+                  <p class="text-stone-600 font-medium">
+                    <span class="font-bold text-amber-700">Location:</span> {event.location}
+                  </p>
+                  <p class="text-stone-600 font-medium">
+                    <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+                    {event.costNote && ` — ${event.costNote}`}
+                  </p>
                 </div>
-              </div>
-              <div class="border-t border-b border-amber-200 py-3 mb-4 text-stone-600 font-medium">
-                <p>
-                  <span class="font-bold text-amber-700">Location:</span> {event.location}
-                </p>
-                <p>
-                  <span class="font-bold text-amber-700">Cost:</span> {event.cost}
-                  {event.costNote && ` - ${event.costNote}`}
-                </p>
-              </div>
-              <div class={event.image ? "flex flex-col md:flex-row gap-4" : ""}>
                 {event.image && (
-                  <img src={event.image.replace(/^\/public/, '')} alt={event.title} class="rounded-xl w-32 h-32 object-cover border border-amber-200 flex-shrink-0" width="128" height="128" loading="lazy" />
+                  <div class="h-full aspect-square rounded-xl overflow-hidden border border-amber-200">
+                    <img
+                      src={event.image.replace(/^\/public/, '')}
+                      alt={event.title}
+                      class="block w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
                 )}
-                <div class="space-y-3 text-stone-600 font-medium">
-                  {event.description.split('\n\n').map((paragraph) => (
-                    <p>{paragraph}</p>
-                  ))}
-                </div>
+              </div>
+              <div class="border-t border-amber-200 pt-3 space-y-3 text-stone-600 font-medium">
+                {event.description.split('\n\n').map((paragraph) => (
+                  <p>{paragraph}</p>
+                ))}
               </div>
             </a>
           ))

@@ -114,6 +114,14 @@ export function parseDescriptionParagraph(paragraph: string): DescriptionNode[] 
   return nodes;
 }
 
+export function formatEventDateParts(date: Date): { month: string; day: number; weekday: string } {
+  return {
+    month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+    day: date.getDate(),
+    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
+  };
+}
+
 export function formatEventDateWithYear(date: Date): string {
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
