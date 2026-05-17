@@ -2,7 +2,7 @@
 title: Ned Gravel Expo
 date: 2026-07-12
 startTime: "10:00 AM"
-endTime: "2:00 PM"
+endTime: "4:00 PM"
 location: Nederland, CO
 locationUrl: https://www.nedgravel.com
 cost: FREE
