@@ -6,6 +6,8 @@ endTime: "2:00 PM"
 location: Nederland Farmer's Market
 locationUrl: https://www.google.com/maps/search/?api=1&query=80+E+2nd+St+Nederland+CO+80466
 cost: FREE
+image: /public/images/events/2026-05-24-farmers-market/3.jpg
+images: /public/images/events/2026-05-24-farmers-market/1.jpg,/public/images/events/2026-05-24-farmers-market/2.jpg,/public/images/events/2026-05-24-farmers-market/3.jpg,/public/images/events/2026-05-24-farmers-market/4.jpg
 ---
 
 We'll be creating easy, no-sew tutus and magic wands to be used for all of your spring / summer activities. Birthday party? Tutu. Summer running race? Tutu. Pride brunch? Tutu. Flying chihuahua? Magic wand.
