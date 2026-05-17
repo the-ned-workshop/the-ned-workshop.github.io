@@ -1,5 +1,5 @@
 ---
-title: Nederland Farmer's Market Booth
+title: Nederland Farmer's Market
 date: 2026-08-16
 startTime: "10:00 AM"
 endTime: "2:00 PM"
