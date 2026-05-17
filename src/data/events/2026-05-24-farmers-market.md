@@ -1,5 +1,5 @@
 ---
-title: Nederland Farmer's Market
+title: Nederland Farmer's Market - Tutu and Magic Wand Workshop
 date: 2026-05-24
 startTime: "10:00 AM"
 endTime: "2:00 PM"
@@ -8,4 +8,8 @@ locationUrl: https://www.google.com/maps/search/?api=1&query=80+E+2nd+St+Nederla
 cost: FREE
 ---
 
-Stop by The Ned Workshop's booth at the Nederland Farmer's Market! Come say hi, learn about our tool library and upcoming workshops, and chat with us about how to get involved.
+We'll be creating easy, no-sew tutus and magic wands to be used for all of your spring / summer activities. Birthday party? Tutu. Summer running race? Tutu. Pride brunch? Tutu. Flying chihuahua? Magic wand.
+
+All of the tulle and supplies used in this workshop were donated or purchased second-hand, saving heaps and heaps of frilly fabric from the landfill.
+
+This workshop is designed for all ages, sizes, and genders.
