@@ -52,6 +52,15 @@ const pastEvents = events
                   <p class="text-stone-600 font-medium">{event.startTime} - {event.endTime}</p>
                 </div>
               </div>
+              <div class="border-t border-b border-amber-200 py-3 mb-4 text-stone-600 font-medium">
+                <p>
+                  <span class="font-bold text-amber-700">Location:</span> {event.location}
+                </p>
+                <p>
+                  <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+                  {event.costNote && ` - ${event.costNote}`}
+                </p>
+              </div>
               <div class={event.image ? "flex flex-col md:flex-row gap-4" : ""}>
                 {event.image && (
                   <img src={event.image.replace(/^\/public/, '')} alt={event.title} class="rounded-xl w-32 h-32 object-cover border border-amber-200 flex-shrink-0" width="128" height="128" loading="lazy" />
@@ -60,15 +69,6 @@ const pastEvents = events
                   {event.description.split('\n\n').map((paragraph) => (
                     <p>{paragraph}</p>
                   ))}
-                  <div class="pt-3 border-t border-amber-200">
-                    <p>
-                      <span class="font-bold text-amber-700">Location:</span> {event.location}
-                    </p>
-                    <p>
-                      <span class="font-bold text-amber-700">Cost:</span> {event.cost}
-                      {event.costNote && ` - ${event.costNote}`}
-                    </p>
-                  </div>
                 </div>
               </div>
             </a>

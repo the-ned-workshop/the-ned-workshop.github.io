@@ -1,9 +1,9 @@
 ---
-title: Nederland Farmer's Market
+title: TBD
 date: 2026-08-16
 startTime: "10:00 AM"
 endTime: "2:00 PM"
-location: 80 E 2nd St & 85 E 1st St, Nederland, CO 80466
+location: Nederland Farmer's Market
 locationUrl: https://www.google.com/maps/search/?api=1&query=80+E+2nd+St+Nederland+CO+80466
 cost: FREE
 ---

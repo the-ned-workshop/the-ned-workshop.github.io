@@ -40,6 +40,15 @@ const description = "Upcoming classes, open workshop hours, and a history of pas
                   <p class="text-stone-600 font-medium">{event.startTime} - {event.endTime}</p>
                 </div>
               </div>
+              <div class="border-t border-b border-amber-200 py-3 mb-4 text-stone-600 font-medium">
+                <p>
+                  <span class="font-bold text-amber-700">Location:</span> {event.location}
+                </p>
+                <p>
+                  <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+                  {event.costNote && ` - ${event.costNote}`}
+                </p>
+              </div>
               <div class={event.image ? "flex flex-col md:flex-row gap-4" : ""}>
                 {event.image && (
                   <img
@@ -55,15 +64,6 @@ const description = "Upcoming classes, open workshop hours, and a history of pas
                   {event.description.split('\n\n').map((paragraph) => (
                     <p>{paragraph}</p>
                   ))}
-                  <div class="pt-3 border-t border-amber-200">
-                    <p>
-                      <span class="font-bold text-amber-700">Location:</span> {event.location}
-                    </p>
-                    <p>
-                      <span class="font-bold text-amber-700">Cost:</span> {event.cost}
-                      {event.costNote && ` - ${event.costNote}`}
-                    </p>
-                  </div>
                 </div>
               </div>
             </a>

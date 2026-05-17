@@ -95,6 +95,28 @@ const eventJsonLd = {
         </div>
       </div>
 
+      <div class="border-t border-b border-amber-300 py-6 mb-6 space-y-2 text-lg text-stone-700 font-medium">
+        <p>
+          <span class="font-bold text-amber-800">Location:</span>{' '}
+          {event.locationUrl ? (
+            <a
+              href={event.locationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
+            >
+              {event.location}
+            </a>
+          ) : (
+            event.location
+          )}
+        </p>
+        <p>
+          <span class="font-bold text-amber-800">Cost:</span> {event.cost}
+          {event.costNote && ` - ${event.costNote}`}
+        </p>
+      </div>
+
       <div class={event.image ? "flex flex-col md:flex-row gap-6 mb-6" : "mb-6"}>
         {event.image && (
           <img
@@ -123,32 +145,11 @@ const eventJsonLd = {
         </div>
       </div>
 
-      <div class="border-t border-amber-300 pt-6 space-y-2 text-lg text-stone-700 font-medium">
-        <p>
-          <span class="font-bold text-amber-800">Location:</span>{' '}
-          {event.locationUrl ? (
-            <a
-              href={event.locationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
-            >
-              {event.location}
-            </a>
-          ) : (
-            event.location
-          )}
-        </p>
-        <p>
-          <span class="font-bold text-amber-800">Cost:</span> {event.cost}
-          {event.costNote && ` - ${event.costNote}`}
-        </p>
-        {event.rsvpWidgetId && (
-          <div class="pt-4">
-            <givebutter-widget id={event.rsvpWidgetId}></givebutter-widget>
-          </div>
-        )}
-      </div>
+      {event.rsvpWidgetId && (
+        <div class="border-t border-amber-300 pt-6">
+          <givebutter-widget id={event.rsvpWidgetId}></givebutter-widget>
+        </div>
+      )}
 
       {event.images.length > 0 && (
         <div class="mt-10">
