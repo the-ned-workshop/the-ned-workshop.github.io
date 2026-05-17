@@ -31,37 +31,47 @@ const description = "Upcoming classes, open workshop hours, and a history of pas
           upcomingEvents.map((event) => (
             <a
               href={`/events/${event.slug}`}
-              class="block bg-white/80 rounded-2xl p-6 border border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 group"
+              class="block bg-white/80 rounded-2xl border border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 group overflow-hidden"
             >
-              <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-4 mb-4">
-                <div class="min-w-0 space-y-0.5">
-                  <h3 class="text-2xl font-bold text-amber-700 group-hover:text-amber-800">{event.title}</h3>
-                  <p class="text-stone-600 font-medium">
-                    <span class="font-bold text-amber-700">Time:</span> {formatEventDate(event.date)}, {event.startTime} – {event.endTime}
-                  </p>
-                  <p class="text-stone-600 font-medium">
-                    <span class="font-bold text-amber-700">Location:</span> {event.location}
-                  </p>
-                  <p class="text-stone-600 font-medium">
-                    <span class="font-bold text-amber-700">Cost:</span> {event.cost}
-                    {event.costNote && ` — ${event.costNote}`}
-                  </p>
-                </div>
-                {event.image && (
-                  <div class="h-full aspect-square rounded-xl overflow-hidden border border-amber-200">
-                    <img
-                      src={event.image.replace(/^\/public/, '')}
-                      alt={event.title}
-                      class="block w-full h-full object-cover"
-                      loading="lazy"
-                    />
+              {event.image && (
+                <img
+                  src={event.image.replace(/^\/public/, '')}
+                  alt={event.title}
+                  class="block md:hidden w-full h-44 object-cover"
+                  loading="lazy"
+                />
+              )}
+              <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-4 mb-4">
+                  <div class="min-w-0 space-y-0.5">
+                    <h3 class="text-2xl font-bold text-amber-700 group-hover:text-amber-800">{event.title}</h3>
+                    <p class="text-stone-600 font-medium">
+                      <span class="font-bold text-amber-700">Time:</span> {formatEventDate(event.date)}, {event.startTime} – {event.endTime}
+                    </p>
+                    <p class="text-stone-600 font-medium">
+                      <span class="font-bold text-amber-700">Location:</span> {event.location}
+                    </p>
+                    <p class="text-stone-600 font-medium">
+                      <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+                      {event.costNote && ` — ${event.costNote}`}
+                    </p>
                   </div>
-                )}
-              </div>
-              <div class="border-t border-amber-200 pt-3 space-y-3 text-stone-600 font-medium">
-                {event.description.split('\n\n').map((paragraph) => (
-                  <p>{paragraph}</p>
-                ))}
+                  {event.image && (
+                    <div class="hidden md:block relative h-full aspect-square rounded-xl overflow-hidden border border-amber-200">
+                      <img
+                        src={event.image.replace(/^\/public/, '')}
+                        alt={event.title}
+                        class="absolute inset-0 w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                </div>
+                <div class="border-t border-amber-200 pt-3 space-y-3 text-stone-600 font-medium">
+                  {event.description.split('\n\n').map((paragraph) => (
+                    <p>{paragraph}</p>
+                  ))}
+                </div>
               </div>
             </a>
           ))

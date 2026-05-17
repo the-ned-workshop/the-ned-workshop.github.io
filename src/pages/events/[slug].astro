@@ -87,7 +87,7 @@ const eventJsonLd = {
 
   <section class="bg-amber-100 py-16">
     <div class="max-w-5xl mx-auto px-6">
-      <div class="grid grid-cols-[minmax(0,1fr)_auto] gap-5 md:gap-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-5 md:gap-6 mb-6">
         <div class="min-w-0 space-y-1">
           <h1 class="text-3xl md:text-4xl font-extrabold text-amber-700">{event.title}</h1>
           <p class="text-lg text-stone-700 font-medium">
@@ -114,11 +114,11 @@ const eventJsonLd = {
           </p>
         </div>
         {event.image && (
-          <div class="h-full aspect-square rounded-xl overflow-hidden border-2 border-amber-200">
+          <div class="hidden md:block relative h-full aspect-square rounded-xl overflow-hidden border-2 border-amber-200">
             <img
               src={eventImage}
               alt={event.title}
-              class="block w-full h-full object-cover"
+              class="absolute inset-0 w-full h-full object-cover"
             />
           </div>
         )}
