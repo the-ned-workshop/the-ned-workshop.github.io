@@ -91,6 +91,29 @@ export function formatEventDate(date: Date): string {
   });
 }
 
+export type DescriptionNode =
+  | { type: 'text'; value: string }
+  | { type: 'link'; href: string; label: string };
+
+export function parseDescriptionParagraph(paragraph: string): DescriptionNode[] {
+  const urlPattern = /\bhttps?:\/\/[^\s<]+[^\s<.,;:!?)\]'"]/g;
+  const nodes: DescriptionNode[] = [];
+  let cursor = 0;
+  for (const match of paragraph.matchAll(urlPattern)) {
+    const start = match.index ?? 0;
+    if (start > cursor) {
+      nodes.push({ type: 'text', value: paragraph.slice(cursor, start) });
+    }
+    const href = match[0];
+    nodes.push({ type: 'link', href, label: href.replace(/^https?:\/\//, '') });
+    cursor = start + href.length;
+  }
+  if (cursor < paragraph.length) {
+    nodes.push({ type: 'text', value: paragraph.slice(cursor) });
+  }
+  return nodes;
+}
+
 export function formatEventDateWithYear(date: Date): string {
   return date.toLocaleDateString('en-US', {
     weekday: 'long',

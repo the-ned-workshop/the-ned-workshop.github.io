@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getEvents, formatEventDate } from '../../lib/events';
+import { getEvents, formatEventDate, parseDescriptionParagraph } from '../../lib/events';
 
 export async function getStaticPaths() {
   const events = await getEvents();
@@ -107,7 +107,18 @@ const eventJsonLd = {
         )}
         <div class="space-y-4 text-lg text-stone-700 font-medium">
           {event.description.split('\n\n').map((paragraph) => (
-            <p>{paragraph}</p>
+            <p>
+              {parseDescriptionParagraph(paragraph).map((node) => (
+                node.type === 'text' ? node.value : (
+                  <a
+                    href={node.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
+                  >{node.label}</a>
+                )
+              ))}
+            </p>
           ))}
         </div>
       </div>
