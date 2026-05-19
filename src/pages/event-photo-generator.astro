@@ -50,6 +50,9 @@
       p.lede { margin-top: 0; color: var(--stone); }
       .input-row {
         margin: 1.5rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
       }
       input[type="text"] {
         width: 100%;
@@ -180,17 +183,23 @@
     <main>
       <h1>Event Photo Generator</h1>
       <p class="lede">
-        Type a wordmark, get matching Facebook event and Instagram square
+        Type a title, get matching Facebook event and Instagram square
         photos ready to upload.
       </p>
 
       <div class="input-row">
         <input
           type="text"
-          id="wordmark"
-          placeholder="e.g. NED GRAVEL EXPO"
+          id="title"
+          placeholder="Title (e.g. NED GRAVEL EXPO)"
           autocomplete="off"
           autofocus
+        />
+        <input
+          type="text"
+          id="subtitle"
+          placeholder="Subtitle (optional)"
+          autocomplete="off"
         />
       </div>
 
@@ -227,6 +236,7 @@
           hairlineH: 6,
           band: { fillY: 935, height: 70 },
           attribution: { fontSize: 30, letterSpacing: 6 },
+          subtitle: { fontSize: 38, letterSpacing: 1, gap: 0.55 },
         },
         {
           slug: 'ig-square',
@@ -239,10 +249,11 @@
           hairlineH: 4,
           band: { fillY: 1010, height: 70 },
           attribution: { fontSize: 22, letterSpacing: 4 },
+          subtitle: { fontSize: 26, letterSpacing: 1, gap: 0.55 },
         },
       ];
-      // Fraction of usable canvas width before the wordmark wraps.
-      const WORDMARK_WIDTH_FRACTION = 0.9;
+      // Fraction of usable canvas width before text wraps.
+      const TEXT_WIDTH_FRACTION = 0.9;
       // Baseline → optical center, as a fraction of font-size (approx for these fonts).
       const OPTICAL_OFFSET = 0.35;
 
@@ -294,25 +305,25 @@
       function getMeasureCtx() {
         return (getMeasureCtx.ctx ||= document.createElement('canvas').getContext('2d'));
       }
-      function measureWordmarkWidth(text, fontSize, letterSpacing) {
+      function measureTextWidth(text, fontFamily, fontWeight, fontSize, letterSpacing) {
         const ctx = getMeasureCtx();
-        ctx.font = `${fontSize}px "Caprasimo", Georgia, serif`;
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
         const base = ctx.measureText(text).width;
         // SVG letter-spacing adds spacing between every adjacent character pair.
         const lsContribution = Math.max(0, text.length - 1) * letterSpacing;
         return base + lsContribution;
       }
-      function wrapWordmark(text, fontSize, letterSpacing, maxWidth) {
+      function wrapText(text, fontFamily, fontWeight, fontSize, letterSpacing, maxWidth) {
         const words = text.split(/\s+/).filter(Boolean);
         if (!words.length) return [text];
-        if (measureWordmarkWidth(text, fontSize, letterSpacing) <= maxWidth) {
+        if (measureTextWidth(text, fontFamily, fontWeight, fontSize, letterSpacing) <= maxWidth) {
           return [text];
         }
         const lines = [];
         let current = words[0];
         for (let i = 1; i < words.length; i++) {
           const candidate = current + ' ' + words[i];
-          if (measureWordmarkWidth(candidate, fontSize, letterSpacing) <= maxWidth) {
+          if (measureTextWidth(candidate, fontFamily, fontWeight, fontSize, letterSpacing) <= maxWidth) {
             current = candidate;
           } else {
             lines.push(current);
@@ -322,27 +333,62 @@
         lines.push(current);
         return lines;
       }
+      const TITLE_FONT = ['"Caprasimo", Georgia, serif', 'normal'];
+      const SUBTITLE_FONT = ['"Baloo 2", "Helvetica Neue", sans-serif', '600'];
 
-      function buildSvg(wordmark, fontCss, L) {
+      function buildSvg(title, subtitle, fontCss, L) {
         const fontStyle = fontCss
           ? fontCss
           : "@import url('" + FONTS_CSS_URL.replace(/&/g, '&amp;') + "');";
 
-        // Wrap wordmark into one or more lines, then vertically center the
-        // block around the configured baseline.
-        const maxTextWidth = L.W * WORDMARK_WIDTH_FRACTION;
-        const lines = wrapWordmark(wordmark, L.fontSize, L.letterSpacing, maxTextWidth);
-        const lineHeight = L.fontSize * 1.1;
-        const startY = L.baselineY - ((lines.length - 1) * lineHeight) / 2;
-        const tspans = lines
+        const maxTextWidth = L.W * TEXT_WIDTH_FRACTION;
+
+        // Wrap title (Caprasimo) and the optional subtitle (Baloo 2).
+        const titleLines = wrapText(
+          title, TITLE_FONT[0], TITLE_FONT[1],
+          L.fontSize, L.letterSpacing, maxTextWidth
+        );
+        const titleLH = L.fontSize * 1.1;
+        const titleBlockH = (titleLines.length - 1) * titleLH;
+
+        const hasSubtitle = !!(subtitle && subtitle.trim());
+        const subtitleLines = hasSubtitle
+          ? wrapText(
+              subtitle.trim(), SUBTITLE_FONT[0], SUBTITLE_FONT[1],
+              L.subtitle.fontSize, L.subtitle.letterSpacing, maxTextWidth
+            )
+          : [];
+        const subtitleLH = L.subtitle.fontSize * 1.2;
+        const subtitleBlockH = hasSubtitle ? (subtitleLines.length - 1) * subtitleLH : 0;
+
+        // Gap between the title and subtitle blocks (in font-size units of
+        // the title), only added when subtitle is present.
+        const gap = hasSubtitle ? L.fontSize * L.subtitle.gap : 0;
+
+        // Center the combined block around L.baselineY by lining up the
+        // midpoint between the first title baseline and the last subtitle
+        // baseline with L.baselineY.
+        const combinedH = titleBlockH + gap + subtitleBlockH;
+        const titleStartY = L.baselineY - combinedH / 2;
+        const subtitleStartY = titleStartY + titleBlockH + gap;
+
+        const titleTspans = titleLines
           .map(
             (line, i) =>
-              `<tspan x="${L.W / 2}" y="${startY + i * lineHeight}">${xmlEscape(line)}</tspan>`
+              `<tspan x="${L.W / 2}" y="${titleStartY + i * titleLH}">${xmlEscape(line)}</tspan>`
           )
           .join('');
 
-        // Compute attribution baseline so the optical center sits in the middle
-        // of the amber bar regardless of layout.
+        const subtitleTspans = hasSubtitle
+          ? subtitleLines
+              .map(
+                (line, i) =>
+                  `<tspan x="${L.W / 2}" y="${subtitleStartY + i * subtitleLH}">${xmlEscape(line)}</tspan>`
+              )
+              .join('')
+          : '';
+
+        // Attribution baseline → optical center sits at the bar center.
         const barTop = L.band.fillY;
         const barHeight = L.band.height;
         const barCenter = barTop + barHeight / 2;
@@ -354,13 +400,15 @@
   <defs>
     <style>
       ${fontStyle}
-      .wordmark { font-family: 'Caprasimo', 'Georgia', serif; fill: ${COLORS.amberDeep}; }
+      .title { font-family: 'Caprasimo', 'Georgia', serif; fill: ${COLORS.amberDeep}; }
+      .subtitle { font-family: 'Baloo 2', 'Helvetica Neue', sans-serif; font-weight: 600; fill: ${COLORS.amberDark}; }
       .attribution { font-family: 'Baloo 2', 'Helvetica Neue', sans-serif; font-weight: 700; fill: ${COLORS.amberDark}; }
     </style>
   </defs>
   <rect width="${L.W}" height="${L.H}" fill="${COLORS.cream}"/>
   <rect x="0" y="0" width="${L.W}" height="${L.hairlineH}" fill="${COLORS.amberLight}"/>
-  <text text-anchor="middle" class="wordmark" font-size="${L.fontSize}" letter-spacing="${L.letterSpacing}">${tspans}</text>
+  <text text-anchor="middle" class="title" font-size="${L.fontSize}" letter-spacing="${L.letterSpacing}">${titleTspans}</text>
+  ${hasSubtitle ? `<text text-anchor="middle" class="subtitle" font-size="${L.subtitle.fontSize}" letter-spacing="${L.subtitle.letterSpacing}">${subtitleTspans}</text>` : ''}
   <rect x="0" y="${separatorY}" width="${L.W}" height="2" fill="${COLORS.amberDeep}" opacity="0.35"/>
   <rect x="0" y="${barTop}" width="${L.W}" height="${barHeight}" fill="${COLORS.amberLight}"/>
   <text x="${L.W / 2}" y="${attrY}" text-anchor="middle" class="attribution" font-size="${L.attribution.fontSize}" letter-spacing="${L.attribution.letterSpacing}">THE NED WORKSHOP</text>
@@ -406,7 +454,7 @@
         return u;
       }
 
-      function renderPreviewCard(layout, wordmark, svgUrl) {
+      function renderPreviewCard(layout, title, svgUrl) {
         const card = document.createElement('div');
         card.className = 'preview-card';
 
@@ -416,7 +464,7 @@
 
         const img = document.createElement('img');
         img.src = svgUrl;
-        img.alt = wordmark;
+        img.alt = title;
         img.width = layout.W;
         img.height = layout.H;
         card.appendChild(img);
@@ -514,10 +562,11 @@
       let generationToken = 0;
 
       async function generate() {
-        const wordmark = $('wordmark').value.trim();
+        const title = $('title').value.trim();
+        const subtitle = $('subtitle').value.trim();
         const token = ++generationToken;
 
-        if (!wordmark) {
+        if (!title) {
           clearLastUrls();
           $('previews').innerHTML = '';
           $('downloadAll').hidden = true;
@@ -526,7 +575,7 @@
           return;
         }
 
-        const slug = slugify(wordmark);
+        const slug = slugify(title);
         $('downloadAll').hidden = true;
 
         // Track URLs created by THIS run separately so we can clean them up
@@ -549,12 +598,12 @@
 
           for (const layout of LAYOUTS) {
             status(`Rendering ${layout.label}…`);
-            const svg = buildSvg(wordmark, fontCss, layout);
+            const svg = buildSvg(title, subtitle, fontCss, layout);
             const svgUrl = svgToBlobUrl(svg);
             newUrls.push(svgUrl);
             const pngBlob = await rasterizeToPng(svg, layout.W, layout.H);
             if (token !== generationToken) { revokeNew(); return; }
-            newPreviews.appendChild(renderPreviewCard(layout, wordmark, svgUrl));
+            newPreviews.appendChild(renderPreviewCard(layout, title, svgUrl));
             nextBundle.push({
               name: `${layout.slug}-${slug}.svg`,
               data: new TextEncoder().encode(svg),
@@ -607,24 +656,27 @@
         setTimeout(() => URL.revokeObjectURL(url), 1500);
       }
 
-      // Keep the URL synced with the wordmark so the page is reload-shareable.
-      function syncUrl(wordmark) {
+      // Keep the URL synced with the inputs so the page is reload-shareable.
+      function syncUrl() {
+        const title = $('title').value.trim();
+        const subtitle = $('subtitle').value.trim();
         const url = new URL(window.location.href);
-        if (wordmark) {
-          url.searchParams.set('wordmark', wordmark);
-        } else {
-          url.searchParams.delete('wordmark');
-        }
+        if (title) url.searchParams.set('title', title);
+        else url.searchParams.delete('title');
+        if (subtitle) url.searchParams.set('subtitle', subtitle);
+        else url.searchParams.delete('subtitle');
         const next = url.pathname + (url.search ? url.search : '') + url.hash;
         if (next !== window.location.pathname + window.location.search + window.location.hash) {
           window.history.replaceState(null, '', next);
         }
       }
 
-      $('wordmark').addEventListener('input', (e) => {
-        syncUrl(e.target.value.trim());
+      function onInputChange() {
+        syncUrl();
         debouncedGenerate();
-      });
+      }
+      $('title').addEventListener('input', onInputChange);
+      $('subtitle').addEventListener('input', onInputChange);
       $('downloadAll').addEventListener('click', downloadAll);
 
       // Lightbox: click a preview image to open; click backdrop, Escape, or
@@ -655,13 +707,15 @@
         if (e.key === 'Escape' && !$('lightbox').hidden) closeLightbox();
       });
 
-      // Pre-fill from ?wordmark=... on load and auto-generate if present.
+      // Pre-fill from ?title=... &subtitle=... on load and auto-generate if a
+      // title is provided.
       (() => {
-        const initial = new URLSearchParams(window.location.search).get('wordmark');
-        if (initial) {
-          $('wordmark').value = initial;
-          generate();
-        }
+        const params = new URLSearchParams(window.location.search);
+        const initialTitle = params.get('title');
+        const initialSubtitle = params.get('subtitle');
+        if (initialTitle) $('title').value = initialTitle;
+        if (initialSubtitle) $('subtitle').value = initialSubtitle;
+        if (initialTitle) generate();
       })();
     </script>
   </body>
