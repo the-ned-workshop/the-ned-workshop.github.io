@@ -1,0 +1,668 @@
+---
+// Internal tool: generates Facebook Event cover photos in the browser.
+// Mirrors scripts/generate-event-cover.js. Not linked from the site and
+// excluded from the sitemap (see astro.config.mjs).
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Event Photo Generator (internal)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Caprasimo&display=swap"
+    />
+    <style>
+      :root {
+        --cream: #fffbeb;
+        --amber-light: #fcd34d;
+        --amber-mid: #f59e0b;
+        --amber-deep: #d97706;
+        --amber-dark: #b45309;
+        --stone: #57534e;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--cream);
+        color: var(--stone);
+        font-family: 'Baloo 2', system-ui, sans-serif;
+        font-weight: 600;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-family: 'Caprasimo', Georgia, serif;
+        font-weight: 400;
+        color: var(--amber-deep);
+        font-size: 2.5rem;
+        margin: 0 0 0.5rem;
+      }
+      p.lede { margin-top: 0; color: var(--stone); }
+      .input-row {
+        margin: 1.5rem 0;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        border: 2px solid var(--amber-light);
+        border-radius: 0.5rem;
+        background: white;
+        color: var(--stone);
+        font-family: inherit;
+        font-weight: 600;
+      }
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--amber-mid);
+      }
+      button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+        font-family: inherit;
+        font-weight: 700;
+        background: var(--amber-mid);
+        color: white;
+        border: 0;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+      button:hover { background: var(--amber-deep); }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      #status {
+        min-height: 1.25rem;
+        font-size: 0.95rem;
+        color: var(--amber-dark);
+      }
+      #previews {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        max-width: 780px;
+      }
+      #previews:empty { display: none; }
+      .preview-card {
+        min-width: 0;
+        border: 2px solid var(--amber-light);
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background: white;
+        display: flex;
+        flex-direction: column;
+      }
+      .preview-card h2 {
+        margin: 0;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        background: var(--cream);
+        color: var(--amber-dark);
+        border-bottom: 2px solid var(--amber-light);
+      }
+      .preview-card img {
+        display: block;
+        width: 100%;
+        height: auto;
+        background: white;
+        cursor: zoom-in;
+      }
+      #lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.92);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        z-index: 100;
+        cursor: zoom-out;
+      }
+      #lightbox[hidden] { display: none; }
+      #lightbox img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        background: white;
+      }
+      #lightboxClose {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 0;
+        border-radius: 999px;
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #lightboxClose:hover { background: rgba(255, 255, 255, 0.2); }
+      #downloadAll {
+        display: block;
+        margin: 0 auto 1.25rem;
+      }
+      #downloadAll[hidden] { display: none; }
+      details {
+        margin-top: 2rem;
+        font-size: 0.9rem;
+        color: var(--stone);
+      }
+      summary { cursor: pointer; font-weight: 700; }
+      code {
+        background: white;
+        padding: 0.1rem 0.4rem;
+        border-radius: 0.25rem;
+        border: 1px solid var(--amber-light);
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Event Photo Generator</h1>
+      <p class="lede">
+        Type a wordmark, get matching Facebook event and Instagram square
+        photos ready to upload.
+      </p>
+
+      <div class="input-row">
+        <input
+          type="text"
+          id="wordmark"
+          placeholder="e.g. NED GRAVEL EXPO"
+          autocomplete="off"
+          autofocus
+        />
+      </div>
+
+      <button type="button" id="downloadAll" hidden>Download All (.zip)</button>
+
+      <div id="status"></div>
+      <div id="previews"></div>
+    </main>
+
+    <div id="lightbox" hidden aria-hidden="true" role="dialog">
+      <button type="button" id="lightboxClose" aria-label="Close">×</button>
+      <img id="lightboxImage" alt="" />
+    </div>
+
+    <script is:inline>
+      const COLORS = {
+        cream: '#FFFBEB',
+        amberLight: '#FCD34D',
+        amberDeep: '#D97706',
+        amberDark: '#B45309',
+      };
+      const FONTS_CSS_URL =
+        'https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Caprasimo&display=swap';
+
+      const LAYOUTS = [
+        {
+          slug: 'fb-event-cover',
+          label: 'Facebook Event Cover (1920×1005)',
+          W: 1920,
+          H: 1005,
+          fontSize: 100,
+          letterSpacing: 3,
+          baselineY: 510,
+          hairlineH: 6,
+          band: { fillY: 935, height: 70 },
+          attribution: { fontSize: 30, letterSpacing: 6 },
+        },
+        {
+          slug: 'ig-square',
+          label: 'Instagram Square (1080×1080)',
+          W: 1080,
+          H: 1080,
+          fontSize: 64,
+          letterSpacing: 2,
+          baselineY: 560,
+          hairlineH: 4,
+          band: { fillY: 1010, height: 70 },
+          attribution: { fontSize: 22, letterSpacing: 4 },
+        },
+      ];
+      // Fraction of usable canvas width before the wordmark wraps.
+      const WORDMARK_WIDTH_FRACTION = 0.9;
+      // Baseline → optical center, as a fraction of font-size (approx for these fonts).
+      const OPTICAL_OFFSET = 0.35;
+
+      const $ = (id) => document.getElementById(id);
+      const status = (msg) => ($('status').textContent = msg);
+      const xmlEscape = (s) =>
+        s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const slugify = (s) =>
+        s
+          .toLowerCase()
+          .replace(/['‘’]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+
+      // Cache the inlined font CSS so we only download/encode once.
+      let inlinedFontCssPromise = null;
+      function getInlinedFontCss() {
+        if (!inlinedFontCssPromise) {
+          inlinedFontCssPromise = (async () => {
+            const cssText = await fetch(FONTS_CSS_URL).then((r) => r.text());
+            const urlRegex = /url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g;
+            const urls = [...new Set([...cssText.matchAll(urlRegex)].map((m) => m[1]))];
+            const dataUrls = await Promise.all(
+              urls.map((url) =>
+                fetch(url)
+                  .then((r) => r.blob())
+                  .then(
+                    (blob) =>
+                      new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                      })
+                  )
+              )
+            );
+            let result = cssText;
+            urls.forEach((url, i) => {
+              result = result.split(url).join(dataUrls[i]);
+            });
+            return result;
+          })();
+        }
+        return inlinedFontCssPromise;
+      }
+
+      // Canvas reused across calls for text measurement.
+      function getMeasureCtx() {
+        return (getMeasureCtx.ctx ||= document.createElement('canvas').getContext('2d'));
+      }
+      function measureWordmarkWidth(text, fontSize, letterSpacing) {
+        const ctx = getMeasureCtx();
+        ctx.font = `${fontSize}px "Caprasimo", Georgia, serif`;
+        const base = ctx.measureText(text).width;
+        // SVG letter-spacing adds spacing between every adjacent character pair.
+        const lsContribution = Math.max(0, text.length - 1) * letterSpacing;
+        return base + lsContribution;
+      }
+      function wrapWordmark(text, fontSize, letterSpacing, maxWidth) {
+        const words = text.split(/\s+/).filter(Boolean);
+        if (!words.length) return [text];
+        if (measureWordmarkWidth(text, fontSize, letterSpacing) <= maxWidth) {
+          return [text];
+        }
+        const lines = [];
+        let current = words[0];
+        for (let i = 1; i < words.length; i++) {
+          const candidate = current + ' ' + words[i];
+          if (measureWordmarkWidth(candidate, fontSize, letterSpacing) <= maxWidth) {
+            current = candidate;
+          } else {
+            lines.push(current);
+            current = words[i];
+          }
+        }
+        lines.push(current);
+        return lines;
+      }
+
+      function buildSvg(wordmark, fontCss, L) {
+        const fontStyle = fontCss
+          ? fontCss
+          : "@import url('" + FONTS_CSS_URL.replace(/&/g, '&amp;') + "');";
+
+        // Wrap wordmark into one or more lines, then vertically center the
+        // block around the configured baseline.
+        const maxTextWidth = L.W * WORDMARK_WIDTH_FRACTION;
+        const lines = wrapWordmark(wordmark, L.fontSize, L.letterSpacing, maxTextWidth);
+        const lineHeight = L.fontSize * 1.1;
+        const startY = L.baselineY - ((lines.length - 1) * lineHeight) / 2;
+        const tspans = lines
+          .map(
+            (line, i) =>
+              `<tspan x="${L.W / 2}" y="${startY + i * lineHeight}">${xmlEscape(line)}</tspan>`
+          )
+          .join('');
+
+        // Compute attribution baseline so the optical center sits in the middle
+        // of the amber bar regardless of layout.
+        const barTop = L.band.fillY;
+        const barHeight = L.band.height;
+        const barCenter = barTop + barHeight / 2;
+        const attrY = barCenter + L.attribution.fontSize * OPTICAL_OFFSET;
+        const separatorY = barTop - 2;
+
+        return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${L.W} ${L.H}" width="${L.W}" height="${L.H}">
+  <defs>
+    <style>
+      ${fontStyle}
+      .wordmark { font-family: 'Caprasimo', 'Georgia', serif; fill: ${COLORS.amberDeep}; }
+      .attribution { font-family: 'Baloo 2', 'Helvetica Neue', sans-serif; font-weight: 700; fill: ${COLORS.amberDark}; }
+    </style>
+  </defs>
+  <rect width="${L.W}" height="${L.H}" fill="${COLORS.cream}"/>
+  <rect x="0" y="0" width="${L.W}" height="${L.hairlineH}" fill="${COLORS.amberLight}"/>
+  <text text-anchor="middle" class="wordmark" font-size="${L.fontSize}" letter-spacing="${L.letterSpacing}">${tspans}</text>
+  <rect x="0" y="${separatorY}" width="${L.W}" height="2" fill="${COLORS.amberDeep}" opacity="0.35"/>
+  <rect x="0" y="${barTop}" width="${L.W}" height="${barHeight}" fill="${COLORS.amberLight}"/>
+  <text x="${L.W / 2}" y="${attrY}" text-anchor="middle" class="attribution" font-size="${L.attribution.fontSize}" letter-spacing="${L.attribution.letterSpacing}">THE NED WORKSHOP</text>
+</svg>
+`;
+      }
+
+      function svgToBlobUrl(svg) {
+        return URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+      }
+
+      function rasterizeToPng(svgWithInlinedFonts, W, H) {
+        return new Promise((resolve, reject) => {
+          const url = svgToBlobUrl(svgWithInlinedFonts);
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = W;
+            canvas.height = H;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, W, H);
+            URL.revokeObjectURL(url);
+            canvas.toBlob((blob) => {
+              if (!blob) reject(new Error('canvas.toBlob returned null'));
+              else resolve(blob);
+            }, 'image/png');
+          };
+          img.onerror = (e) => {
+            URL.revokeObjectURL(url);
+            reject(e);
+          };
+          img.src = url;
+        });
+      }
+
+      let lastUrls = [];
+      function clearLastUrls() {
+        lastUrls.forEach((u) => URL.revokeObjectURL(u));
+        lastUrls = [];
+      }
+      function trackUrl(u) {
+        lastUrls.push(u);
+        return u;
+      }
+
+      function renderPreviewCard(layout, wordmark, svgUrl) {
+        const card = document.createElement('div');
+        card.className = 'preview-card';
+
+        const heading = document.createElement('h2');
+        heading.textContent = layout.label;
+        card.appendChild(heading);
+
+        const img = document.createElement('img');
+        img.src = svgUrl;
+        img.alt = wordmark;
+        img.width = layout.W;
+        img.height = layout.H;
+        card.appendChild(img);
+
+        return card;
+      }
+
+      // ---- Minimal "stored" (no-compression) ZIP encoder ----
+      // PNGs already carry their own deflate compression; SVGs are small,
+      // so a stored zip is plenty for this internal tool.
+      const CRC_TABLE = (() => {
+        const t = new Uint32Array(256);
+        for (let i = 0; i < 256; i++) {
+          let c = i;
+          for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+          t[i] = c >>> 0;
+        }
+        return t;
+      })();
+      function crc32(u8) {
+        let c = 0xffffffff;
+        for (let i = 0; i < u8.length; i++) c = (c >>> 8) ^ CRC_TABLE[(c ^ u8[i]) & 0xff];
+        return (c ^ 0xffffffff) >>> 0;
+      }
+      function buildZip(entries) {
+        const enc = new TextEncoder();
+        const parts = [];
+        const central = [];
+        let offset = 0;
+        for (const { name, data } of entries) {
+          const nameBytes = enc.encode(name);
+          const crc = crc32(data);
+          const size = data.length;
+          const lfh = new ArrayBuffer(30);
+          const v = new DataView(lfh);
+          v.setUint32(0, 0x04034b50, true);
+          v.setUint16(4, 20, true);
+          v.setUint16(6, 0, true);
+          v.setUint16(8, 0, true);
+          v.setUint16(10, 0, true);
+          v.setUint16(12, 0, true);
+          v.setUint32(14, crc, true);
+          v.setUint32(18, size, true);
+          v.setUint32(22, size, true);
+          v.setUint16(26, nameBytes.length, true);
+          v.setUint16(28, 0, true);
+          parts.push(new Uint8Array(lfh), nameBytes, data);
+
+          const cdh = new ArrayBuffer(46);
+          const c = new DataView(cdh);
+          c.setUint32(0, 0x02014b50, true);
+          c.setUint16(4, 20, true);
+          c.setUint16(6, 20, true);
+          c.setUint16(8, 0, true);
+          c.setUint16(10, 0, true);
+          c.setUint16(12, 0, true);
+          c.setUint16(14, 0, true);
+          c.setUint32(16, crc, true);
+          c.setUint32(20, size, true);
+          c.setUint32(24, size, true);
+          c.setUint16(28, nameBytes.length, true);
+          c.setUint16(30, 0, true);
+          c.setUint16(32, 0, true);
+          c.setUint16(34, 0, true);
+          c.setUint16(36, 0, true);
+          c.setUint32(38, 0, true);
+          c.setUint32(42, offset, true);
+          central.push(new Uint8Array(cdh), nameBytes);
+          offset += 30 + nameBytes.length + size;
+        }
+        const centralStart = offset;
+        let centralSize = 0;
+        for (const p of central) centralSize += p.length;
+        const eocd = new ArrayBuffer(22);
+        const e = new DataView(eocd);
+        e.setUint32(0, 0x06054b50, true);
+        e.setUint16(4, 0, true);
+        e.setUint16(6, 0, true);
+        e.setUint16(8, entries.length, true);
+        e.setUint16(10, entries.length, true);
+        e.setUint32(12, centralSize, true);
+        e.setUint32(16, centralStart, true);
+        e.setUint16(20, 0, true);
+        return new Blob([...parts, ...central, new Uint8Array(eocd)], {
+          type: 'application/zip',
+        });
+      }
+
+      // Generated files for the most recent run: [{name, data: Uint8Array}, ...]
+      let bundle = [];
+      let bundleSlug = '';
+
+      // Tokenize runs so that a fast-typing user's later input always wins
+      // over an in-flight earlier generation.
+      let generationToken = 0;
+
+      async function generate() {
+        const wordmark = $('wordmark').value.trim();
+        const token = ++generationToken;
+
+        if (!wordmark) {
+          clearLastUrls();
+          $('previews').innerHTML = '';
+          $('downloadAll').hidden = true;
+          bundle = [];
+          status('');
+          return;
+        }
+
+        const slug = slugify(wordmark);
+        $('downloadAll').hidden = true;
+
+        // Track URLs created by THIS run separately so we can clean them up
+        // on abort without nuking URLs that are still wired into the DOM.
+        const newUrls = [];
+        const revokeNew = () => newUrls.forEach((u) => URL.revokeObjectURL(u));
+
+        try {
+          status('Fetching fonts…');
+          const fontCss = await getInlinedFontCss();
+          // Wait for the page's @font-face declarations (Caprasimo, Baloo 2) so
+          // canvas.measureText returns the right widths for text wrapping.
+          if (document.fonts && document.fonts.ready) {
+            try { await document.fonts.ready; } catch {}
+          }
+          if (token !== generationToken) { revokeNew(); return; }
+
+          const newPreviews = document.createDocumentFragment();
+          const nextBundle = [];
+
+          for (const layout of LAYOUTS) {
+            status(`Rendering ${layout.label}…`);
+            const svg = buildSvg(wordmark, fontCss, layout);
+            const svgUrl = svgToBlobUrl(svg);
+            newUrls.push(svgUrl);
+            const pngBlob = await rasterizeToPng(svg, layout.W, layout.H);
+            if (token !== generationToken) { revokeNew(); return; }
+            newPreviews.appendChild(renderPreviewCard(layout, wordmark, svgUrl));
+            nextBundle.push({
+              name: `${layout.slug}-${slug}.svg`,
+              data: new TextEncoder().encode(svg),
+            });
+            nextBundle.push({
+              name: `${layout.slug}-${slug}.png`,
+              data: new Uint8Array(await pngBlob.arrayBuffer()),
+            });
+            if (token !== generationToken) { revokeNew(); return; }
+          }
+
+          // Atomic swap: install new previews + URLs, then revoke the old set.
+          const oldUrls = lastUrls;
+          lastUrls = newUrls;
+          $('previews').innerHTML = '';
+          $('previews').appendChild(newPreviews);
+          bundle = nextBundle;
+          bundleSlug = slug;
+          $('downloadAll').hidden = false;
+          status('');
+          oldUrls.forEach((u) => URL.revokeObjectURL(u));
+        } catch (err) {
+          if (token !== generationToken) { revokeNew(); return; }
+          revokeNew();
+          console.error(err);
+          status(`Failed: ${err?.message || err}`);
+        }
+      }
+
+      function debounce(fn, ms) {
+        let timer = null;
+        return (...args) => {
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(() => fn(...args), ms);
+        };
+      }
+      const debouncedGenerate = debounce(generate, 250);
+
+      function downloadAll() {
+        if (!bundle.length) return;
+        const zipBlob = buildZip(bundle);
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `event-photos-${bundleSlug}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        // Revoke shortly after so the download has time to start.
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+      }
+
+      // Keep the URL synced with the wordmark so the page is reload-shareable.
+      function syncUrl(wordmark) {
+        const url = new URL(window.location.href);
+        if (wordmark) {
+          url.searchParams.set('wordmark', wordmark);
+        } else {
+          url.searchParams.delete('wordmark');
+        }
+        const next = url.pathname + (url.search ? url.search : '') + url.hash;
+        if (next !== window.location.pathname + window.location.search + window.location.hash) {
+          window.history.replaceState(null, '', next);
+        }
+      }
+
+      $('wordmark').addEventListener('input', (e) => {
+        syncUrl(e.target.value.trim());
+        debouncedGenerate();
+      });
+      $('downloadAll').addEventListener('click', downloadAll);
+
+      // Lightbox: click a preview image to open; click backdrop, Escape, or
+      // the close button to dismiss.
+      function openLightbox(src, alt) {
+        const lb = $('lightbox');
+        $('lightboxImage').src = src;
+        $('lightboxImage').alt = alt || '';
+        lb.hidden = false;
+        lb.setAttribute('aria-hidden', 'false');
+      }
+      function closeLightbox() {
+        const lb = $('lightbox');
+        lb.hidden = true;
+        lb.setAttribute('aria-hidden', 'true');
+        $('lightboxImage').removeAttribute('src');
+      }
+      $('previews').addEventListener('click', (e) => {
+        const img = e.target.closest('img');
+        if (!img) return;
+        openLightbox(img.src, img.alt);
+      });
+      $('lightbox').addEventListener('click', (e) => {
+        // Close on backdrop click, but not when clicking the image itself.
+        if (e.target.id === 'lightbox' || e.target.id === 'lightboxClose') closeLightbox();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !$('lightbox').hidden) closeLightbox();
+      });
+
+      // Pre-fill from ?wordmark=... on load and auto-generate if present.
+      (() => {
+        const initial = new URLSearchParams(window.location.search).get('wordmark');
+        if (initial) {
+          $('wordmark').value = initial;
+          generate();
+        }
+      })();
+    </script>
+  </body>
+</html>
