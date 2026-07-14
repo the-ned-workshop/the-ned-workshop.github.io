@@ -1,5 +1,5 @@
 ---
-title: TBD
+title: DIY Dog Collar
 date: 2026-08-16
 startTime: "10:00 AM"
 endTime: "2:00 PM"
