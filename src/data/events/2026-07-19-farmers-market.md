@@ -1,5 +1,5 @@
 ---
-title: DIY Nature Crown
+title: Nature Crown Workshop
 date: 2026-07-19
 startTime: "10:00 AM"
 endTime: "2:00 PM"
