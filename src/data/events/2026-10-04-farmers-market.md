@@ -1,5 +1,5 @@
 ---
-title: TBD
+title: DIY Harvest Paper Lantern
 date: 2026-10-04
 startTime: "10:00 AM"
 endTime: "2:00 PM"
