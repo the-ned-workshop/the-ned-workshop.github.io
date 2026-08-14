@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NoUpcomingEvents from '../components/NoUpcomingEvents.astro';
-import { getEvents, formatEventDate, formatEventDateWithYear } from '../lib/events';
+import { getEvents, formatEventDate, formatEventDateWithYear, stripDescriptionLinks } from '../lib/events';
 
 const events = await getEvents();
 const now = new Date();
@@ -68,7 +68,7 @@ const description = "Upcoming classes, open workshop hours, and a history of pas
                   )}
                 </div>
                 <div class="border-t border-amber-200 pt-3 space-y-3 text-stone-600 font-medium">
-                  {event.description.split('\n\n').map((paragraph) => (
+                  {stripDescriptionLinks(event.description).split('\n\n').map((paragraph) => (
                     <p>{paragraph}</p>
                   ))}
                 </div>

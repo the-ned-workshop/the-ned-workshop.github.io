@@ -119,6 +119,20 @@ export function parseDescriptionParagraph(paragraph: string): DescriptionNode[] 
   return nodes;
 }
 
+// Plain-text form of a description, with link markup reduced to its label.
+// Used where a real anchor can't go — inside the clickable event cards on the
+// listing pages, and in meta/JSON-LD description text.
+export function stripDescriptionLinks(text: string): string {
+  return text
+    .split('\n\n')
+    .map((paragraph) =>
+      parseDescriptionParagraph(paragraph)
+        .map((node) => (node.type === 'text' ? node.value : node.label))
+        .join('')
+    )
+    .join('\n\n');
+}
+
 export function formatEventDateParts(date: Date): { month: string; day: number; weekday: string } {
   return {
     month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),

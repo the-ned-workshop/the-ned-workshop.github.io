@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getEvents, formatEventDate, parseDescriptionParagraph } from '../../lib/events';
+import { getEvents, formatEventDate, parseDescriptionParagraph, stripDescriptionLinks } from '../../lib/events';
 
 export async function getStaticPaths() {
   const events = await getEvents();
@@ -36,7 +36,7 @@ const eventJsonLd = {
   "@context": "https://schema.org",
   "@type": "Event",
   "name": event.title,
-  "description": event.description,
+  "description": stripDescriptionLinks(event.description),
   "startDate": startDateTime,
   "endDate": endDateTime,
   "location": {
@@ -69,7 +69,7 @@ const eventJsonLd = {
 
 <BaseLayout
   title={event.title}
-  description={event.description.slice(0, 160)}
+  description={stripDescriptionLinks(event.description).slice(0, 160)}
   image={eventImage}
   type="article"
   jsonLd={eventJsonLd}
