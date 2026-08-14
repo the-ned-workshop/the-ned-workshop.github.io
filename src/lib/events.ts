@@ -96,17 +96,22 @@ export type DescriptionNode =
   | { type: 'link'; href: string; label: string };
 
 export function parseDescriptionParagraph(paragraph: string): DescriptionNode[] {
-  const urlPattern = /\bhttps?:\/\/[^\s<]+[^\s<.,;:!?)\]'"]/g;
+  // Markdown-style [label](url) first, then bare URLs.
+  const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|\bhttps?:\/\/[^\s<]+[^\s<.,;:!?)\]'"]/g;
   const nodes: DescriptionNode[] = [];
   let cursor = 0;
-  for (const match of paragraph.matchAll(urlPattern)) {
+  for (const match of paragraph.matchAll(linkPattern)) {
     const start = match.index ?? 0;
     if (start > cursor) {
       nodes.push({ type: 'text', value: paragraph.slice(cursor, start) });
     }
-    const href = match[0];
-    nodes.push({ type: 'link', href, label: href.replace(/^https?:\/\//, '') });
-    cursor = start + href.length;
+    if (match[1]) {
+      nodes.push({ type: 'link', href: match[2], label: match[1] });
+    } else {
+      const href = match[0];
+      nodes.push({ type: 'link', href, label: href.replace(/^https?:\/\//, '') });
+    }
+    cursor = start + match[0].length;
   }
   if (cursor < paragraph.length) {
     nodes.push({ type: 'text', value: paragraph.slice(cursor) });
