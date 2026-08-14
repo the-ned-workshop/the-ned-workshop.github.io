@@ -5,7 +5,7 @@ import { getEvents, formatEventDate, formatEventDateWithYear } from '../lib/even
 
 const events = await getEvents();
 const now = new Date();
-const upcomingEvents = events.filter(e => e.date >= now).slice(0, 2);
+const upcomingEvents = events.filter(e => e.date >= now).slice(0, 3);
 const pastEvents = events
   .filter(e => e.date < now)
   .sort((a, b) => b.date.getTime() - a.date.getTime())
