@@ -1,0 +1,75 @@
+---
+import { formatEventDate, parseDescriptionParagraph, type Event } from '../lib/events';
+
+interface Props {
+  event: Event;
+}
+
+const { event } = Astro.props;
+---
+
+<!--
+  The whole card links to the event detail page, but the description can contain
+  its own links, and anchors can't nest. So the title carries the real link and
+  stretches an overlay across the card (z-10, above the positioned thumbnail so
+  that stays clickable), while description links sit above the overlay at z-20 so
+  a click on one wins over the card-wide link.
+-->
+<div class="relative bg-white/80 rounded-2xl border border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 group overflow-hidden">
+  {event.image && (
+    <img
+      src={event.image.replace(/^\/public/, '')}
+      alt={event.title}
+      class="block md:hidden w-full h-44 object-cover"
+      loading="lazy"
+    />
+  )}
+  <div class="p-6">
+    <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-4 mb-4">
+      <div class="min-w-0 space-y-0.5">
+        <h3 class="text-2xl font-bold text-amber-700 group-hover:text-amber-800">
+          <a
+            href={`/events/${event.slug}`}
+            class="before:content-[''] before:absolute before:inset-0 before:z-10"
+          >{event.title}</a>
+        </h3>
+        <p class="text-stone-600 font-medium">
+          <span class="font-bold text-amber-700">Time:</span> {formatEventDate(event.date)}, {event.startTime} – {event.endTime}
+        </p>
+        <p class="text-stone-600 font-medium">
+          <span class="font-bold text-amber-700">Location:</span> {event.location}
+        </p>
+        <p class="text-stone-600 font-medium">
+          <span class="font-bold text-amber-700">Cost:</span> {event.cost}
+          {event.costNote && ` — ${event.costNote}`}
+        </p>
+      </div>
+      {event.image && (
+        <div class="hidden md:block relative h-full aspect-square rounded-xl overflow-hidden border border-amber-200">
+          <img
+            src={event.image.replace(/^\/public/, '')}
+            alt={event.title}
+            class="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
+    </div>
+    <div class="border-t border-amber-200 pt-3 space-y-3 text-stone-600 font-medium">
+      {event.description.split('\n\n').map((paragraph) => (
+        <p>
+          {parseDescriptionParagraph(paragraph).map((node) => (
+            node.type === 'text' ? node.value : (
+              <a
+                href={node.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="relative z-20 text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300"
+              >{node.label}</a>
+            )
+          ))}
+        </p>
+      ))}
+    </div>
+  </div>
+</div>
