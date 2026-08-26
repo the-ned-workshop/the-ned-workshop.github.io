@@ -55,7 +55,7 @@ const { event } = Astro.props;
         </div>
       )}
     </div>
-    <div class="border-t border-amber-200 pt-3 space-y-3 text-stone-600 font-medium">
+    <div class="border-t border-amber-200 pt-3 space-y-3 text-stone-600 font-medium whitespace-pre-line">
       {event.description.split('\n\n').map((paragraph) => (
         <p>
           {parseDescriptionParagraph(paragraph).map((node) => (
