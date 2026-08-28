@@ -10,22 +10,14 @@ const upcomingEvents = events.filter(e => e.date >= now).slice(0, 3);
 const pastEvents = events
   .filter(e => e.date < now)
   .sort((a, b) => b.date.getTime() - a.date.getTime())
-  .slice(0, 2);
+  .slice(0, 4);
 ---
 
 <BaseLayout title="The Ned Workshop — Tool Library & Workshops in Nederland, CO">
   <!-- Hero Section -->
   <section class="bg-amber-50">
     <h1 class="sr-only">The Ned Workshop &mdash; Community Tool Library &amp; Skill-Building Workshops in Nederland, Colorado</h1>
-    <img
-      src="/images/hero.webp"
-      alt="The Ned Workshop"
-      width="2000"
-      height="898"
-      fetchpriority="high"
-      class="w-full max-w-[1000px] mx-auto h-auto md:h-[400px] lg:h-[460px] object-cover object-center block"
-    />
-    <div class="max-w-5xl mx-auto px-6 py-16">
+    <div class="max-w-5xl mx-auto px-6 py-8">
       <p
         class="text-center text-4xl sm:text-5xl md:text-6xl text-amber-600 tracking-[0.15em] pl-[0.15em]"
         style="font-family: 'Caprasimo', serif;"

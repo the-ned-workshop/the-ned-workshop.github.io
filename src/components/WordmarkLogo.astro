@@ -1,0 +1,103 @@
+---
+/**
+ * The Ned Workshop wordmark: the quilted banner redrawn as type in Titan One.
+ *
+ * Three patches on one row — a starburst "the", the coral "NED" tile and the cream
+ * "workshop" panel — on the dark green quilt field.
+ *
+ * The whole lockup scales off the single `--wm-size` custom property, so callers set one
+ * value (usually a clamp) rather than sizing anything individually.
+ *
+ * The favicon, app icon and og:image are the same mark drawn as real files by
+ * scripts/generate-brand-assets.mjs — keep the colors and proportions here in sync with it.
+ */
+interface Props {
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { class: className = '', ...rest } = Astro.props;
+---
+
+<div class:list={['wordmark', className]} role="img" aria-label="The Ned Workshop" {...rest}>
+  <div class="wm-row">
+    <span class="wm-the">the</span>
+    <span class="wm-ned">NED</span>
+    <span class="wm-shop">workshop</span>
+  </div>
+</div>
+
+<style>
+  .wordmark {
+    /* Colors lifted from the quilted banner */
+    --wm-quilt: #23392c;
+    --wm-pink: #f2a7c6;
+    --wm-coral: #ff8383; /* amber-500 in tailwind.config.mjs — the Donate button */
+    --wm-cream: #fbf5e3;
+    --wm-ink: #1e3326;
+    --wm-green: #3f5c3a;
+    /* Single knob for scaling the whole lockup */
+    --wm-size: 1rem;
+
+    font-family: 'Titan One', 'Baloo 2', cursive, system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    background: var(--wm-quilt);
+    padding: calc(var(--wm-size) * 1.4) calc(var(--wm-size) * 1.6);
+    border-radius: calc(var(--wm-size) * 1.8);
+  }
+
+  .wm-row {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--wm-size) * 1.1);
+  }
+
+  .wm-the,
+  .wm-ned,
+  .wm-shop {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .wm-the {
+    background: var(--wm-pink);
+    color: var(--wm-ink);
+    font-size: calc(var(--wm-size) * 2.2);
+    width: calc(var(--wm-size) * 6.2);
+    height: calc(var(--wm-size) * 6.2);
+    flex-shrink: 0;
+    transform: rotate(-6deg);
+    clip-path: polygon(
+      50.00% 0.00%, 60.09% 12.33%, 75.00% 6.70%, 77.58% 22.42%, 93.30% 25.00%,
+      87.67% 39.91%, 100.00% 50.00%, 87.67% 60.09%, 93.30% 75.00%, 77.58% 77.58%,
+      75.00% 93.30%, 60.09% 87.67%, 50.00% 100.00%, 39.91% 87.67%, 25.00% 93.30%,
+      22.42% 77.58%, 6.70% 75.00%, 12.33% 60.09%, 0.00% 50.00%, 12.33% 39.91%,
+      6.70% 25.00%, 22.42% 22.42%, 25.00% 6.70%, 39.91% 12.33%
+    );
+  }
+
+  .wm-ned {
+    background: var(--wm-coral);
+    color: var(--wm-cream);
+    font-size: calc(var(--wm-size) * 3);
+    letter-spacing: 0.04em;
+    padding: calc(var(--wm-size) * 0.5) calc(var(--wm-size) * 1.1)
+      calc(var(--wm-size) * 0.65);
+    border-radius: calc(var(--wm-size) * 1.2);
+  }
+
+  .wm-shop {
+    background: var(--wm-cream);
+    color: var(--wm-green);
+    font-size: calc(var(--wm-size) * 3.4);
+    padding: calc(var(--wm-size) * 0.45) calc(var(--wm-size) * 1.2)
+      calc(var(--wm-size) * 0.6);
+    border-radius: calc(var(--wm-size) * 1.2);
+  }
+</style>
