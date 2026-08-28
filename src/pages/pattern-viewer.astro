@@ -1,0 +1,1232 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const description =
+  'Open a layered PDF sewing pattern in your browser, turn size layers on and off, and print just the sizes you need at true 1:1 scale. No Adobe Acrobat required, and your file never leaves your device.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'PDF Pattern Layer Viewer',
+  url: 'https://nedworkshop.org/pattern-viewer',
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any (web browser)',
+  browserRequirements: 'Requires JavaScript.',
+  description,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  publisher: { '@type': 'Organization', name: 'The Ned Workshop' },
+};
+---
+
+<BaseLayout title="PDF Pattern Layer Viewer" description={description} jsonLd={jsonLd}>
+  <!-- Page header -->
+  <section class="bg-amber-50 py-10 border-b-2 border-amber-200">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <h1 class="text-4xl md:text-6xl font-extrabold text-amber-700">
+        PDF Pattern Layer Viewer
+      </h1>
+      <p class="mt-4 text-lg md:text-2xl text-stone-700 font-semibold">
+        Pick your size. Print it at 1:1. No Acrobat needed.
+      </p>
+      <p class="mt-3 text-sm md:text-base text-stone-600 font-medium max-w-2xl mx-auto">
+        Layered PDF patterns let you hide the sizes you are not cutting &mdash; but most PDF readers
+        will not show you the switches. This one does, right here in your browser.
+        <strong class="text-stone-700">Your pattern never leaves your device.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- No-JS fallback -->
+  <noscript>
+    <div class="max-w-3xl mx-auto px-6 py-10">
+      <p class="bg-white border-2 border-amber-300 rounded-2xl p-5 text-stone-700 font-semibold">
+        This tool needs JavaScript to open and draw your PDF. Everything runs on your own computer
+        &mdash; nothing is uploaded &mdash; but that does mean the page cannot work with scripting
+        turned off.
+      </p>
+    </div>
+  </noscript>
+
+  <!-- Step 1: choose a file -->
+  <section id="pv-intro" class="py-12 bg-amber-100">
+    <div class="max-w-3xl mx-auto px-6">
+      <label
+        id="pv-dropzone"
+        for="pv-file"
+        class="block bg-white/80 border-4 border-dashed border-amber-300 rounded-3xl p-10 text-center cursor-pointer transition-colors hover:border-amber-500 hover:bg-white"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-amber-500" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <path d="M14 2v6h6"></path>
+          <path d="M12 18v-6"></path>
+          <path d="m9 15 3-3 3 3"></path>
+        </svg>
+        <p class="mt-4 text-2xl font-extrabold text-amber-700">Choose a PDF pattern</p>
+        <p class="mt-1 text-stone-600 font-semibold">or drag and drop it here</p>
+        <input id="pv-file" type="file" accept="application/pdf,.pdf" class="sr-only" />
+      </label>
+
+      <p id="pv-intro-status" class="mt-4 text-center font-bold text-amber-700 min-h-[1.5rem]" role="status" aria-live="polite"></p>
+
+      <div class="mt-10 grid sm:grid-cols-3 gap-5 text-center">
+        <div class="bg-white/70 rounded-2xl border border-amber-200 p-5">
+          <p class="text-3xl" aria-hidden="true">&#128274;</p>
+          <p class="mt-2 font-extrabold text-amber-700">Stays on your device</p>
+          <p class="mt-1 text-sm text-stone-600 font-medium">The PDF is read in your browser. There is no upload and no server.</p>
+        </div>
+        <div class="bg-white/70 rounded-2xl border border-amber-200 p-5">
+          <p class="text-3xl" aria-hidden="true">&#129525;</p>
+          <p class="mt-2 font-extrabold text-amber-700">Hide the other sizes</p>
+          <p class="mt-1 text-sm text-stone-600 font-medium">Flip off every layer you are not cutting so the lines you trace are the only ones on the page.</p>
+        </div>
+        <div class="bg-white/70 rounded-2xl border border-amber-200 p-5">
+          <p class="text-3xl" aria-hidden="true">&#128207;</p>
+          <p class="mt-2 font-extrabold text-amber-700">Prints at true size</p>
+          <p class="mt-1 text-sm text-stone-600 font-medium">Pages print at their exact PDF dimensions, and you can print the test square first to prove it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: the viewer -->
+  <section id="pv-viewer" class="bg-amber-100 pb-6" hidden>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <!-- Toolbar. The band carries the section background and the full container
+           width so pages scroll cleanly underneath rather than peeking out. -->
+      <div id="pv-toolbar" class="sticky z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-4 pb-3 lg:pt-6 lg:pb-4 bg-amber-100">
+      <div class="bg-white border-2 border-amber-200 rounded-2xl px-3 py-2 lg:px-4 lg:py-3 shadow-sm flex flex-wrap items-center gap-x-4 gap-y-2 lg:gap-y-3">
+        <div class="min-w-0 flex-1">
+          <p id="pv-filename" class="font-extrabold text-amber-700 truncate"></p>
+          <p id="pv-pagecount" class="hidden sm:block text-sm text-stone-500 font-semibold"></p>
+        </div>
+
+        <div class="flex items-center gap-1 bg-amber-50 border border-amber-200 rounded-full p-1">
+          <button id="pv-zoom-out" type="button" aria-label="Zoom out" class="w-9 h-9 rounded-full font-extrabold text-amber-700 hover:bg-amber-200 transition-colors">&minus;</button>
+          <span id="pv-zoom-level" class="w-16 text-center text-sm font-extrabold text-stone-600 tabular-nums">100%</span>
+          <button id="pv-zoom-in" type="button" aria-label="Zoom in" class="w-9 h-9 rounded-full font-extrabold text-amber-700 hover:bg-amber-200 transition-colors">+</button>
+          <button id="pv-zoom-fit" type="button" class="px-3 h-9 rounded-full text-sm font-extrabold text-amber-700 hover:bg-amber-200 transition-colors">Fit</button>
+        </div>
+
+        <button id="pv-print" type="button" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-extrabold uppercase tracking-wider text-sm px-5 py-2.5 rounded-full shadow-md transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9V2h12v7"></path>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <path d="M6 14h12v8H6z"></path>
+          </svg>
+          Print
+        </button>
+
+        <button id="pv-close" type="button" class="text-sm font-extrabold text-stone-500 hover:text-amber-700 underline underline-offset-4 transition-colors">
+          Open a different PDF
+        </button>
+      </div>
+      </div>
+
+      <div class="grid lg:grid-cols-[320px_minmax(0,1fr)] gap-4 items-start">
+        <!-- Layer panel -->
+        <aside id="pv-layers-panel" class="bg-white border-2 border-amber-200 rounded-2xl z-20">
+          <div class="px-4 py-3 border-b-2 border-amber-200 flex items-center justify-between gap-2">
+            <h2 class="text-lg font-extrabold text-amber-700">Layers</h2>
+            <button id="pv-layers-toggle" type="button" class="lg:hidden text-sm font-extrabold text-amber-700" aria-expanded="true" aria-controls="pv-layers-body">Hide</button>
+          </div>
+
+          <div id="pv-layers-body">
+            <div id="pv-layer-actions" class="px-4 py-3 flex flex-wrap gap-2 border-b border-amber-100" hidden>
+              <button id="pv-show-all" type="button" class="px-3 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-200 transition-colors">Show all</button>
+              <button id="pv-hide-all" type="button" class="px-3 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-200 transition-colors">Hide all</button>
+              <button id="pv-reset-layers" type="button" class="px-3 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-200 transition-colors">Reset</button>
+            </div>
+
+            <div id="pv-layer-list" class="px-2 py-2 max-h-[60vh] overflow-y-auto"></div>
+
+            <p id="pv-no-layers" class="px-4 py-4 text-sm text-stone-600 font-medium" hidden>
+              This PDF has no layers in it, so there is nothing to switch on or off. That usually
+              means it is a single-size pattern, or the sizes were flattened before it was saved.
+              You can still view and print it at 1:1 from here.
+            </p>
+          </div>
+        </aside>
+
+        <!-- Pages -->
+        <div id="pv-pages" class="min-w-0"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Print dialog -->
+  <dialog id="pv-print-dialog" class="rounded-2xl border-2 border-amber-300 p-0 w-[min(32rem,calc(100vw-2rem))] backdrop:bg-stone-900/40">
+    <form method="dialog" id="pv-print-form" class="bg-white">
+      <div class="px-6 py-4 border-b-2 border-amber-200">
+        <h2 class="text-2xl font-extrabold text-amber-700">Print pattern</h2>
+        <p class="text-sm text-stone-600 font-semibold mt-1">Hidden layers are left out of the printout.</p>
+      </div>
+
+      <div id="pv-print-options" class="px-6 py-5 space-y-5">
+        <fieldset>
+          <legend class="font-extrabold text-stone-700 mb-2">What to print</legend>
+
+          <label class="flex items-start gap-3 py-1.5 cursor-pointer">
+            <input type="radio" name="pv-scope" value="test" class="mt-1 accent-amber-500 w-4 h-4" checked />
+            <span class="min-w-0">
+              <span class="font-bold text-stone-700">Just the test square, on page</span>
+              <input id="pv-test-page" type="number" min="1" value="1" class="w-16 ml-1 px-2 py-0.5 border-2 border-amber-200 rounded-lg font-bold text-stone-700 tabular-nums" aria-label="Page containing the test square" />
+              <span class="block text-xs text-stone-500 font-medium mt-1">
+                Print this one page first and measure the square with a ruler. If it measures right,
+                the rest of the pattern will too. If the square comes out blank, the pattern keeps it
+                on a shared layer &mdash; switch something like &ldquo;All Sizes&rdquo; back on.
+              </span>
+            </span>
+          </label>
+
+          <label class="flex items-start gap-3 py-1.5 cursor-pointer">
+            <input type="radio" name="pv-scope" value="all" class="mt-1 accent-amber-500 w-4 h-4" />
+            <span class="font-bold text-stone-700">
+              The whole pattern
+              <span id="pv-all-count" class="text-stone-500 font-semibold"></span>
+            </span>
+          </label>
+
+          <label class="flex items-start gap-3 py-1.5 cursor-pointer">
+            <input type="radio" name="pv-scope" value="range" class="mt-1 accent-amber-500 w-4 h-4" />
+            <span class="min-w-0">
+              <span class="font-bold text-stone-700">Pages</span>
+              <input id="pv-range" type="text" placeholder="e.g. 1, 4-9" class="w-40 ml-1 px-2 py-0.5 border-2 border-amber-200 rounded-lg font-bold text-stone-700" aria-label="Page range to print" />
+            </span>
+          </label>
+        </fieldset>
+
+        <div>
+          <label for="pv-paper" class="block font-extrabold text-stone-700 mb-1">Paper you are printing on</label>
+          <select id="pv-paper" class="w-full px-3 py-2 border-2 border-amber-200 rounded-lg font-bold text-stone-700 bg-white">
+            <option value="letter" selected>US Letter &mdash; 8.5 &times; 11 in</option>
+            <option value="a4">A4 &mdash; 210 &times; 297 mm</option>
+            <option value="legal">US Legal &mdash; 8.5 &times; 14 in</option>
+            <option value="tabloid">Tabloid &mdash; 11 &times; 17 in</option>
+            <option value="a3">A3 &mdash; 297 &times; 420 mm</option>
+          </select>
+          <p class="mt-1 text-xs text-stone-500 font-medium">
+            Match this to the paper in the tray. The pattern is placed at its true size inside that
+            sheet, so this never rescales it &mdash; it just stops the page spilling onto a second sheet.
+          </p>
+        </div>
+
+        <div>
+          <label for="pv-dpi" class="block font-extrabold text-stone-700 mb-1">Print quality</label>
+          <select id="pv-dpi" class="w-full px-3 py-2 border-2 border-amber-200 rounded-lg font-bold text-stone-700 bg-white">
+            <option value="150" selected>150 DPI &mdash; fast, fine for most patterns</option>
+            <option value="300">300 DPI &mdash; sharper, slower and heavier</option>
+          </select>
+        </div>
+
+        <p id="pv-page-size-note" class="text-sm text-stone-600 font-semibold"></p>
+
+        <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
+          <p class="font-extrabold text-amber-700">When you print the PDF:</p>
+          <ul class="mt-2 text-sm text-stone-700 font-semibold space-y-1 list-disc list-inside">
+            <li>Scale &mdash; Safari calls it Scaling &mdash; at <strong>100%</strong>, or
+              <strong>Actual Size</strong>. Never &ldquo;Fit to page&rdquo;.</li>
+            <li>Paper size set to the same sheet you picked above</li>
+          </ul>
+          <p class="mt-2 text-xs text-stone-500 font-medium">
+            You get a PDF rather than a direct printout on purpose. A web page gets re-laid-out by
+            whichever browser prints it &mdash; Safari in particular ignores the margins a page asks
+            for and pushes every sheet onto a second, mostly blank one. A PDF carries its own page
+            size, so nothing can rescale it behind your back.
+          </p>
+        </div>
+
+        <p id="pv-print-error" class="text-sm font-bold text-amber-800" role="alert" hidden></p>
+      </div>
+
+      <div id="pv-print-progress" class="px-6 py-8 text-center" hidden>
+        <p id="pv-print-progress-text" class="font-extrabold text-amber-700" role="status" aria-live="polite">Preparing pages&hellip;</p>
+        <div class="mt-3 h-2 bg-amber-100 rounded-full overflow-hidden">
+          <div id="pv-print-bar" class="h-full bg-amber-500 transition-[width] duration-200" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div id="pv-print-ready" class="px-6 py-8 text-center" hidden>
+        <p class="text-xl font-extrabold text-amber-700">Your PDF is ready</p>
+        <p id="pv-print-ready-detail" class="mt-1 text-sm text-stone-600 font-semibold"></p>
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+          <a
+            id="pv-open-link"
+            href="#"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-extrabold uppercase tracking-wider text-sm px-6 py-3 rounded-full shadow-md transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 9V2h12v7"></path>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <path d="M6 14h12v8H6z"></path>
+            </svg>
+            Open and print
+          </a>
+          <a
+            id="pv-download-link"
+            download
+            href="#"
+            class="inline-flex items-center gap-2 px-5 py-3 rounded-full font-extrabold text-amber-700 border-2 border-amber-300 hover:bg-amber-50 transition-colors text-sm"
+          >
+            Save to disk
+          </a>
+        </div>
+        <p class="mt-4 text-xs text-stone-500 font-medium max-w-sm mx-auto">
+          &ldquo;Open and print&rdquo; loads the PDF in a new tab. Press
+          <strong>&#8984;P</strong> there and print at <strong>Actual Size</strong> &mdash; a PDF keeps
+          its own page size, so the browser cannot re-lay-it-out the way it does a web page.
+        </p>
+      </div>
+
+      <div class="px-6 py-4 border-t-2 border-amber-200 flex flex-wrap items-center justify-end gap-3">
+        <button id="pv-print-cancel" type="button" class="px-4 py-2.5 rounded-full font-extrabold text-stone-600 hover:bg-stone-100 transition-colors">Cancel</button>
+        <button id="pv-save-pdf" type="button" class="bg-amber-500 hover:bg-amber-600 text-white font-extrabold uppercase tracking-wider text-sm px-5 py-2.5 rounded-full shadow-md transition-colors">Make print-ready PDF</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- How-to -->
+  <section class="py-12 bg-amber-200">
+    <div class="max-w-3xl mx-auto px-6">
+      <h2 class="text-3xl font-extrabold text-amber-700 mb-6">Getting a pattern to print true</h2>
+      <ol class="space-y-4 text-stone-700 font-medium list-decimal list-inside">
+        <li><strong class="text-stone-800">Open your PDF above.</strong> It is read straight off your disk &mdash; nothing is sent anywhere.</li>
+        <li><strong class="text-stone-800">Turn off the sizes you do not need.</strong> Layer names usually look like &ldquo;Size 12&rdquo; or &ldquo;A4 / Letter&rdquo;. Leave any layer holding the outlines, notches, or grainlines switched on.</li>
+        <li><strong class="text-stone-800">Make a PDF of the test square first.</strong> One page, one measurement. Open it, print at 100% or Actual Size, and check the square with a ruler.</li>
+        <li><strong class="text-stone-800">Then do the rest.</strong> Same paper, same settings, and the tiles will line up.</li>
+      </ol>
+      <p class="mt-6 text-sm text-stone-600 font-medium">
+        Stuck on a pattern, or want a hand taping tiles together? Bring it by The Ned Workshop &mdash;
+        we have the table space and the sewing machines.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  /* Tailwind's display utilities outrank the UA rule for the `hidden`
+     attribute, which this page leans on to swap panels in and out. */
+  [hidden] {
+    display: none !important;
+  }
+
+  /* --- Sticky chrome ---
+     Both offsets are measured at runtime (see updateStickyOffsets) rather than
+     hardcoded, because the site header changes height across breakpoints, on
+     font load, and with the iOS safe-area inset. Each element sticks inside its
+     own container, so both release naturally at the end of the page list. */
+  #pv-viewer {
+    scroll-margin-top: var(--pv-header-h, 0px);
+  }
+
+  #pv-toolbar {
+    top: var(--pv-header-h, 0px);
+  }
+
+  @media (min-width: 1024px) {
+    #pv-layers-panel {
+      position: sticky;
+      top: var(--pv-sticky-top, 0px);
+      /* Never taller than what is left of the screen; the layer list scrolls. */
+      max-height: calc(100vh - var(--pv-sticky-top, 0px) - 1.5rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #pv-layers-body {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+    #pv-layer-list {
+      max-height: none;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+  }
+
+  /* --- Screen --- */
+  .pv-page {
+    position: relative;
+    margin: 0 auto 1rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.12), 0 8px 24px rgb(0 0 0 / 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .pv-page canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .pv-page::after {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #78716c;
+    background: rgb(255 255 255 / 0.85);
+    border-top-right-radius: 6px;
+    pointer-events: none;
+  }
+  .pv-page.is-pending::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg, #fafaf9, #fafaf9 10px, #f5f5f4 10px, #f5f5f4 20px);
+  }
+
+  .pv-layer-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .pv-layer-list ul ul {
+    margin-left: 0.75rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid #ffedce;
+  }
+  .pv-layer-group-name {
+    margin: 0.5rem 0 0.25rem;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #a8a29e;
+  }
+  .pv-layer-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 700;
+    color: #44403c;
+    line-height: 1.3;
+  }
+  .pv-layer-row:hover {
+    background: #fff8ee;
+  }
+  .pv-layer-row input {
+    margin-top: 0.15rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: #ff8383;
+    flex: none;
+  }
+
+</style>
+
+<script>
+  import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
+
+  const ZOOM_STEPS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4, 6];
+  const STANDARD_FONT_DATA_URL = '/pdfjs/standard_fonts/';
+
+  const $ = (id) => document.getElementById(id);
+
+  const intro = $('pv-intro');
+  const introStatus = $('pv-intro-status');
+  const dropzone = $('pv-dropzone');
+  const fileInput = $('pv-file');
+  const viewer = $('pv-viewer');
+  const filenameEl = $('pv-filename');
+  const pageCountEl = $('pv-pagecount');
+  const pagesEl = $('pv-pages');
+  const layerListEl = $('pv-layer-list');
+  const layerActionsEl = $('pv-layer-actions');
+  const noLayersEl = $('pv-no-layers');
+  const zoomLevelEl = $('pv-zoom-level');
+  const printDialog = $('pv-print-dialog');
+  const printOptionsEl = $('pv-print-options');
+  const printProgressEl = $('pv-print-progress');
+  const printProgressText = $('pv-print-progress-text');
+  const printBar = $('pv-print-bar');
+  const printErrorEl = $('pv-print-error');
+  const printCancelBtn = $('pv-print-cancel');
+
+  if (!intro || !viewer) throw new Error('pattern-viewer: markup missing');
+
+  layerListEl.classList.add('pv-layer-list');
+
+  // Keep the toolbar and layer panel pinned just under the site header.
+  function updateStickyOffsets() {
+    const siteHeader = document.querySelector('body > header');
+    const headerHeight = siteHeader ? siteHeader.getBoundingClientRect().height : 0;
+    const toolbar = $('pv-toolbar');
+    const toolbarHeight = toolbar ? toolbar.getBoundingClientRect().height : 0;
+    const style = document.documentElement.style;
+    style.setProperty('--pv-header-h', headerHeight + 'px');
+    style.setProperty('--pv-sticky-top', headerHeight + toolbarHeight + 'px');
+  }
+
+  updateStickyOffsets();
+  if (typeof ResizeObserver !== 'undefined') {
+    const stickyObserver = new ResizeObserver(updateStickyOffsets);
+    const siteHeader = document.querySelector('body > header');
+    if (siteHeader) stickyObserver.observe(siteHeader);
+    if ($('pv-toolbar')) stickyObserver.observe($('pv-toolbar'));
+  }
+
+  /** @type {any} */ let pdfjs = null;
+  /** @type {any} */ let pdfDoc = null;
+  /** @type {any} */ let displayConfig = null;
+  /** @type {Record<string, any> | null} */ let layerGroups = null;
+  /** @type {Array<any>} */ let pageViews = [];
+  /** @type {Set<any>} */ const visibleViews = new Set();
+  let renderGeneration = 0;
+  let zoomIndex = ZOOM_STEPS.indexOf(1);
+  let fitScale = 1;
+  let printing = false;
+  let currentFileName = '';
+
+  // ---------------------------------------------------------------- pdf.js
+
+  async function ensurePdfjs() {
+    if (pdfjs) return pdfjs;
+    const lib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    lib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+    pdfjs = lib;
+    return lib;
+  }
+
+  function isCancelled(err) {
+    return err && (err.name === 'RenderingCancelledException' || err.name === 'AbortException');
+  }
+
+  // ------------------------------------------------------------ file input
+
+  function setIntroStatus(msg) {
+    introStatus.textContent = msg || '';
+  }
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (file) openFile(file);
+  });
+
+  ['dragenter', 'dragover'].forEach((type) => {
+    dropzone.addEventListener(type, (event) => {
+      event.preventDefault();
+      dropzone.classList.add('border-amber-500', 'bg-white');
+    });
+  });
+  ['dragleave', 'drop'].forEach((type) => {
+    dropzone.addEventListener(type, () => {
+      dropzone.classList.remove('border-amber-500', 'bg-white');
+    });
+  });
+  dropzone.addEventListener('drop', (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+    if (file) openFile(file);
+  });
+
+  async function openFile(file) {
+    if (file.type && file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) {
+      setIntroStatus('That does not look like a PDF. Pick a .pdf file.');
+      return;
+    }
+
+    setIntroStatus('Opening ' + file.name + '…');
+
+    let lib;
+    try {
+      lib = await ensurePdfjs();
+    } catch (err) {
+      // Loading pdf.js itself failing says nothing about the chosen file, so it
+      // must not be reported as a bad PDF.
+      console.error(err);
+      setIntroStatus('The PDF engine did not load. Reload the page and try again.');
+      fileInput.value = '';
+      return;
+    }
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const doc = await lib.getDocument({
+        data: new Uint8Array(buffer),
+        standardFontDataUrl: STANDARD_FONT_DATA_URL,
+        isEvalSupported: false,
+      }).promise;
+
+      await closeDocument();
+      pdfDoc = doc;
+      displayConfig = await pdfDoc.getOptionalContentConfig();
+      layerGroups = displayConfig.getGroups();
+
+      currentFileName = file.name;
+      filenameEl.textContent = file.name;
+      pageCountEl.textContent = pdfDoc.numPages + (pdfDoc.numPages === 1 ? ' page' : ' pages');
+      $('pv-all-count').textContent = '(' + pdfDoc.numPages + ')';
+
+      resetPrintDialog(pdfDoc.numPages);
+
+      buildLayerPanel();
+
+      // The viewer has to be on screen before pages are built: a hidden section
+      // measures 0 wide, which would peg every page to the fallback width.
+      intro.hidden = true;
+      viewer.hidden = false;
+      await buildPages();
+      updatePageSizeNote();
+      updateStickyOffsets();
+
+      setIntroStatus('');
+      viewer.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    } catch (err) {
+      console.error(err);
+      if (err && err.name === 'PasswordException') {
+        setIntroStatus('That PDF is password protected. Remove the password and try again.');
+      } else {
+        setIntroStatus('Sorry, that PDF could not be opened.');
+      }
+    } finally {
+      fileInput.value = '';
+    }
+  }
+
+  async function closeDocument() {
+    renderGeneration++;
+    for (const view of pageViews) cancelRender(view);
+    visibleViews.clear();
+    pageViews = [];
+    pagesEl.replaceChildren();
+    layerListEl.replaceChildren();
+    if (pdfDoc) {
+      const doc = pdfDoc;
+      pdfDoc = null;
+      try {
+        await doc.destroy();
+      } catch {
+        /* nothing useful to do */
+      }
+    }
+    displayConfig = null;
+    layerGroups = null;
+  }
+
+  $('pv-close').addEventListener('click', async () => {
+    await closeDocument();
+    viewer.hidden = true;
+    intro.hidden = false;
+    setIntroStatus('');
+    intro.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+
+  // ----------------------------------------------------------- layer panel
+
+  function buildLayerPanel() {
+    const order = displayConfig.getOrder();
+    const hasLayers = Boolean(order && order.length && layerGroups);
+
+    layerActionsEl.hidden = !hasLayers;
+    noLayersEl.hidden = hasLayers;
+    layerListEl.hidden = !hasLayers;
+    if (!hasLayers) {
+      layerListEl.replaceChildren();
+      return;
+    }
+    layerListEl.replaceChildren(buildOrderList(order));
+    syncCheckboxes();
+  }
+
+  function buildOrderList(order) {
+    const ul = document.createElement('ul');
+    for (const item of order) {
+      const li = document.createElement('li');
+      if (typeof item === 'string') {
+        li.append(buildLayerRow(item));
+      } else if (Array.isArray(item)) {
+        li.append(buildOrderList(item));
+      } else if (item && typeof item === 'object') {
+        // A named grouping header: it has no group of its own to toggle.
+        const heading = document.createElement('p');
+        heading.className = 'pv-layer-group-name';
+        heading.textContent = item.name || 'Group';
+        li.append(heading);
+        if (Array.isArray(item.order)) li.append(buildOrderList(item.order));
+      }
+      if (li.childNodes.length) ul.append(li);
+    }
+    return ul;
+  }
+
+  function buildLayerRow(id) {
+    const group = layerGroups[id];
+    const label = document.createElement('label');
+    label.className = 'pv-layer-row';
+
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.dataset.ocg = id;
+    input.checked = Boolean(group && group.visible);
+    input.addEventListener('change', () => {
+      // preserveRB lets pdf.js enforce radio-button groups (mutually exclusive
+      // layers), which is why every checkbox is re-read afterwards.
+      displayConfig.setVisibility(id, input.checked, true);
+      syncCheckboxes();
+      invalidateRenders();
+    });
+
+    const text = document.createElement('span');
+    text.textContent = (group && group.name) || 'Untitled layer';
+
+    label.append(input, text);
+    return label;
+  }
+
+  function syncCheckboxes() {
+    for (const input of layerListEl.querySelectorAll('input[data-ocg]')) {
+      const group = displayConfig.getGroup(input.dataset.ocg);
+      input.checked = Boolean(group && group.visible);
+    }
+  }
+
+  function setAllLayers(visible) {
+    if (!layerGroups) return;
+    for (const id of Object.keys(layerGroups)) {
+      displayConfig.setVisibility(id, visible, false);
+    }
+    syncCheckboxes();
+    invalidateRenders();
+  }
+
+  $('pv-show-all').addEventListener('click', () => setAllLayers(true));
+  $('pv-hide-all').addEventListener('click', () => setAllLayers(false));
+  $('pv-reset-layers').addEventListener('click', async () => {
+    // Cheapest way back to the document's own defaults: ask for a fresh config.
+    displayConfig = await pdfDoc.getOptionalContentConfig();
+    layerGroups = displayConfig.getGroups();
+    buildLayerPanel();
+    invalidateRenders();
+  });
+
+  $('pv-layers-toggle').addEventListener('click', (event) => {
+    const body = $('pv-layers-body');
+    const hiding = !body.hidden;
+    body.hidden = hiding;
+    event.currentTarget.textContent = hiding ? 'Show' : 'Hide';
+    event.currentTarget.setAttribute('aria-expanded', String(!hiding));
+  });
+
+  // -------------------------------------------------------------- viewport
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        const view = pageViews[Number(entry.target.dataset.index)];
+        if (!view) continue;
+        if (entry.isIntersecting) {
+          visibleViews.add(view);
+          renderPage(view);
+        } else {
+          visibleViews.delete(view);
+        }
+      }
+    },
+    { rootMargin: '150% 0px' }
+  );
+
+  async function buildPages() {
+    pagesEl.replaceChildren();
+    pageViews = [];
+    visibleViews.clear();
+
+    const first = await pdfDoc.getPage(1);
+    const firstViewport = first.getViewport({ scale: 1 });
+    updateFitScale(firstViewport.width);
+
+    const fragment = document.createDocumentFragment();
+    for (let num = 1; num <= pdfDoc.numPages; num++) {
+      const page = num === 1 ? first : await pdfDoc.getPage(num);
+      const viewport = page.getViewport({ scale: 1 });
+
+      const wrap = document.createElement('div');
+      wrap.className = 'pv-page is-pending';
+      wrap.dataset.index = String(pageViews.length);
+      wrap.dataset.label = 'Page ' + num;
+
+      const canvas = document.createElement('canvas');
+      wrap.append(canvas);
+      fragment.append(wrap);
+
+      pageViews.push({ num, page, viewport, wrap, canvas, task: null, rendered: false });
+    }
+
+    pagesEl.append(fragment);
+    applyLayout();
+    for (const view of pageViews) observer.observe(view.wrap);
+  }
+
+  function updateFitScale(pageWidth) {
+    fitScale = Math.max(0.05, (pagesEl.clientWidth || 800) / pageWidth);
+  }
+
+  function currentScale() {
+    return fitScale * ZOOM_STEPS[zoomIndex];
+  }
+
+  function applyLayout() {
+    const scale = currentScale();
+    for (const view of pageViews) {
+      view.wrap.style.width = Math.round(view.viewport.width * scale) + 'px';
+      view.wrap.style.height = Math.round(view.viewport.height * scale) + 'px';
+    }
+    zoomLevelEl.textContent = Math.round(ZOOM_STEPS[zoomIndex] * 100) + '%';
+  }
+
+  function cancelRender(view) {
+    if (view.task) {
+      try {
+        view.task.cancel();
+      } catch {
+        /* already settled */
+      }
+      view.task = null;
+    }
+    view.rendered = false;
+  }
+
+  function invalidateRenders() {
+    renderGeneration++;
+    for (const view of pageViews) {
+      cancelRender(view);
+      view.wrap.classList.add('is-pending');
+    }
+    for (const view of visibleViews) renderPage(view);
+  }
+
+  async function renderPage(view) {
+    if (view.rendered || view.task || !pdfDoc) return;
+    const generation = renderGeneration;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const viewport = view.page.getViewport({ scale: currentScale() * dpr });
+
+    view.canvas.width = Math.floor(viewport.width);
+    view.canvas.height = Math.floor(viewport.height);
+    const context = view.canvas.getContext('2d', { alpha: false });
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, view.canvas.width, view.canvas.height);
+
+    view.task = view.page.render({
+      canvasContext: context,
+      viewport,
+      optionalContentConfigPromise: Promise.resolve(displayConfig),
+    });
+
+    try {
+      await view.task.promise;
+      if (generation !== renderGeneration) return;
+      view.rendered = true;
+      view.wrap.classList.remove('is-pending');
+    } catch (err) {
+      if (!isCancelled(err)) console.error('page ' + view.num + ' failed to render', err);
+    } finally {
+      if (generation === renderGeneration) view.task = null;
+    }
+  }
+
+  function setZoom(index) {
+    const next = Math.min(ZOOM_STEPS.length - 1, Math.max(0, index));
+    if (next === zoomIndex) return;
+    zoomIndex = next;
+    applyLayout();
+    invalidateRenders();
+  }
+
+  $('pv-zoom-in').addEventListener('click', () => setZoom(zoomIndex + 1));
+  $('pv-zoom-out').addEventListener('click', () => setZoom(zoomIndex - 1));
+  $('pv-zoom-fit').addEventListener('click', () => setZoom(ZOOM_STEPS.indexOf(1)));
+
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    updateStickyOffsets();
+    if (!pdfDoc || viewer.hidden) return;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const first = pageViews[0];
+      if (!first) return;
+      updateFitScale(first.viewport.width);
+      applyLayout();
+      invalidateRenders();
+    }, 200);
+  });
+
+  // ----------------------------------------------------------------- print
+
+  // Only claim a specific @page size when the PDF's pages actually match a
+  // paper the printer will have. Asking a browser to fit an odd page box (many
+  // "print at home" patterns are trimmed to 7x10in so they clear the unprintable
+  // margins of both Letter and A4) onto real paper is how silent rescaling
+  // creeps in, and a rescaled sewing pattern is a ruined one.
+  const PAPER_SIZES = [
+    { name: 'Letter', width: 8.5, height: 11 },
+    { name: 'Legal', width: 8.5, height: 14 },
+    { name: 'Tabloid', width: 11, height: 17 },
+    { name: 'A3', width: 11.693, height: 16.535 },
+    { name: 'A4', width: 8.268, height: 11.693 },
+    { name: 'A5', width: 5.827, height: 8.268 },
+  ];
+
+  // The sheet the printout is laid out on. Declaring this explicitly (rather
+  // than leaving @page size:auto) is what keeps a full-height page from
+  // spilling a blank sheet: with size:auto the browser applies its own default
+  // margins, which on Letter leaves exactly 10in of height for a 10in tall
+  // pattern page, and it rounds the wrong way.
+  const PRINT_PAPERS = {
+    letter: { label: 'US Letter', width: 8.5, height: 11 },
+    a4: { label: 'A4', width: 8.268, height: 11.693 },
+    legal: { label: 'US Legal', width: 8.5, height: 14 },
+    tabloid: { label: 'Tabloid', width: 11, height: 17 },
+    a3: { label: 'A3', width: 11.693, height: 16.535 },
+  };
+
+  function matchPaperSize(widthIn, heightIn) {
+    const near = (a, b) => Math.abs(a - b) <= 0.05;
+    for (const paper of PAPER_SIZES) {
+      const portrait = near(widthIn, paper.width) && near(heightIn, paper.height);
+      const landscape = near(widthIn, paper.height) && near(heightIn, paper.width);
+      if (portrait || landscape) return paper.name;
+    }
+    return null;
+  }
+
+  function describePageSize(widthIn, heightIn) {
+    const trim = (n) => String(Number(n.toFixed(2)));
+    const size = trim(widthIn) + ' \u00d7 ' + trim(heightIn) + ' in';
+    const paper = matchPaperSize(widthIn, heightIn);
+    if (paper) return 'This pattern\u2019s pages are ' + size + ' (' + paper + ').';
+    return (
+      'This pattern\u2019s pages are ' + size + ', which is not a standard paper size. ' +
+      'They will print centred on whatever paper you load, with a margin around them. ' +
+      'That is normal for print-at-home patterns \u2014 just keep the scale at 100%.'
+    );
+  }
+
+  function updatePageSizeNote() {
+    const seen = new Map();
+    for (const view of pageViews) {
+      const widthIn = view.viewport.width / 72;
+      const heightIn = view.viewport.height / 72;
+      const key = widthIn.toFixed(2) + 'x' + heightIn.toFixed(2);
+      if (!seen.has(key)) seen.set(key, [widthIn, heightIn]);
+    }
+
+    const note = $('pv-page-size-note');
+    if (seen.size === 1) {
+      note.textContent = describePageSize(...[...seen.values()][0]);
+    } else if (seen.size > 1) {
+      note.textContent =
+        'This pattern mixes ' + seen.size + ' different page sizes, so each page prints at its ' +
+        'own true size on whatever paper you load. Keep the scale at 100%.';
+    } else {
+      note.textContent = '';
+    }
+  }
+
+  function parsePageRange(text, total) {
+    const pages = [];
+    for (const chunk of String(text).split(',')) {
+      const part = chunk.trim();
+      if (!part) continue;
+      const span = part.match(/^(\d+)\s*-\s*(\d+)$/);
+      if (span) {
+        const from = Number(span[1]);
+        const to = Number(span[2]);
+        if (from < 1 || to > total || from > to) return null;
+        for (let n = from; n <= to; n++) pages.push(n);
+        continue;
+      }
+      if (!/^\d+$/.test(part)) return null;
+      const single = Number(part);
+      if (single < 1 || single > total) return null;
+      pages.push(single);
+    }
+    return pages.length ? [...new Set(pages)] : null;
+  }
+
+  function selectedPrintPages() {
+    const scope = printDialog.querySelector('input[name="pv-scope"]:checked').value;
+    const total = pdfDoc.numPages;
+    if (scope === 'all') return { pages: Array.from({ length: total }, (_, i) => i + 1) };
+    if (scope === 'test') {
+      const num = Number($('pv-test-page').value);
+      if (!Number.isInteger(num) || num < 1 || num > total) {
+        return { error: 'Pick a page between 1 and ' + total + '.' };
+      }
+      return { pages: [num] };
+    }
+    const pages = parsePageRange($('pv-range').value, total);
+    if (!pages) return { error: 'Enter pages like "1, 4-9", between 1 and ' + total + '.' };
+    return { pages };
+  }
+
+  function resetPrintDialog(numPages) {
+    // Page numbers and ranges are meaningless once a different pattern is open.
+    printDialog.querySelector('input[name="pv-scope"][value="test"]').checked = true;
+    const testPage = $('pv-test-page');
+    testPage.max = String(numPages);
+    testPage.value = '1';
+    $('pv-range').value = '';
+    $('pv-dpi').value = '150';
+    printErrorEl.hidden = true;
+  }
+
+  $('pv-print').addEventListener('click', () => {
+    printErrorEl.hidden = true;
+    printOptionsEl.hidden = false;
+    printProgressEl.hidden = true;
+    $('pv-print-ready').hidden = true;
+    $('pv-save-pdf').disabled = false;
+    $('pv-save-pdf').hidden = false;
+    printCancelBtn.textContent = 'Cancel';
+    printDialog.showModal();
+  });
+
+  printCancelBtn.addEventListener('click', () => printDialog.close());
+
+  // The dialog's form is method="dialog", so Enter in the page or range field
+  // would otherwise just dismiss it.
+  $('pv-print-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!printing) $('pv-save-pdf').click();
+  });
+
+  $('pv-save-pdf').addEventListener('click', async () => {
+    if (printing) return;
+    const selection = selectedPrintPages();
+    if (selection.error) {
+      printErrorEl.textContent = selection.error;
+      printErrorEl.hidden = false;
+      return;
+    }
+    const paper = PRINT_PAPERS[$('pv-paper').value] || PRINT_PAPERS.letter;
+
+    printErrorEl.hidden = true;
+    printing = true;
+    printOptionsEl.hidden = true;
+    printProgressEl.hidden = false;
+    $('pv-save-pdf').disabled = true;
+
+    try {
+      await savePdf(selection.pages, Number($('pv-dpi').value), paper);
+      printing = false;
+      printProgressEl.hidden = true;
+      $('pv-print-ready').hidden = false;
+      $('pv-save-pdf').hidden = true;
+      printCancelBtn.textContent = 'Done';
+    } catch (err) {
+      // A paper mismatch is ordinary user input, not a fault worth logging.
+      if (!(err instanceof PaperTooSmallError)) console.error(err);
+      printing = false;
+      printOptionsEl.hidden = false;
+      printProgressEl.hidden = true;
+      printErrorEl.textContent =
+        err instanceof PaperTooSmallError
+          ? 'Page ' + err.pageNumber + ' is bigger than ' + err.paper.label +
+            ', so it would be cut off. Pick a larger paper size.'
+          : 'The PDF could not be built. Try 150 DPI, or fewer pages at a time.';
+      printErrorEl.hidden = false;
+    } finally {
+      $('pv-save-pdf').disabled = false;
+    }
+  });
+
+  async function buildPrintConfig() {
+    const printConfig = await pdfDoc.getOptionalContentConfig({ intent: 'print' });
+    if (layerGroups) {
+      for (const id of Object.keys(layerGroups)) {
+        const group = displayConfig.getGroup(id);
+        printConfig.setVisibility(id, Boolean(group && group.visible), false);
+      }
+    }
+    return printConfig;
+  }
+
+  function encodeLatin1(text) {
+    const out = new Uint8Array(text.length);
+    for (let i = 0; i < text.length; i++) out[i] = text.charCodeAt(i) & 0xff;
+    return out;
+  }
+
+  async function deflateBytes(bytes) {
+    if (typeof CompressionStream === 'undefined') return null;
+    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+
+  function rgbaToRgb(data) {
+    const rgb = new Uint8Array((data.length / 4) * 3);
+    for (let i = 0, j = 0; i < data.length; i += 4, j += 3) {
+      rgb[j] = data[i];
+      rgb[j + 1] = data[i + 1];
+      rgb[j + 2] = data[i + 2];
+    }
+    return rgb;
+  }
+
+  const round = (n) => Math.round(n * 1000) / 1000;
+
+  class PaperTooSmallError extends Error {
+    constructor(pageNumber, paper) {
+      super('page ' + pageNumber + ' does not fit on ' + paper.label);
+      this.name = 'PaperTooSmallError';
+      this.pageNumber = pageNumber;
+      this.paper = paper;
+    }
+  }
+
+  async function buildPrintablePdf(pageNumbers, dpi, paper, printConfig, onProgress) {
+    const chunks = [];
+    let length = 0;
+    const push = (bytes) => {
+      chunks.push(bytes);
+      length += bytes.length;
+    };
+    const pushText = (text) => push(encodeLatin1(text));
+
+    // Object ids are fixed up front: 1 catalog, 2 page tree, then three objects
+    // per page (page dict, content stream, image).
+    const count = pageNumbers.length;
+    const objectCount = 2 + count * 3;
+    const offsets = new Array(objectCount + 1).fill(0);
+    const pageId = (i) => 3 + i * 3;
+
+    const writeObject = (id, body) => {
+      offsets[id] = length;
+      pushText(id + ' 0 obj\n' + body + '\nendobj\n');
+    };
+    const writeStream = (id, dict, bytes) => {
+      offsets[id] = length;
+      pushText(id + ' 0 obj\n<< ' + dict + ' /Length ' + bytes.length + ' >>\nstream\n');
+      push(bytes);
+      pushText('\nendstream\nendobj\n');
+    };
+
+    pushText('%PDF-1.4\n%\xe2\xe3\xcf\xd3\n');
+
+    const kids = pageNumbers.map((_, i) => pageId(i) + ' 0 R').join(' ');
+    writeObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    writeObject(2, '<< /Type /Pages /Kids [' + kids + '] /Count ' + count + ' >>');
+
+    const paperWidth = round(paper.width * 72);
+    const paperHeight = round(paper.height * 72);
+    const scale = dpi / 72;
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d', { alpha: false, willReadFrequently: true });
+
+    for (let i = 0; i < count; i++) {
+      onProgress(i, count);
+
+      const page = await pdfDoc.getPage(pageNumbers[i]);
+      const pointViewport = page.getViewport({ scale: 1 });
+
+      // Clipping a pattern silently would be worse than refusing: the cut lines
+      // nearest the edge are exactly the ones that matter.
+      if (
+        pointViewport.width / 72 > paper.width + 0.02 ||
+        pointViewport.height / 72 > paper.height + 0.02
+      ) {
+        throw new PaperTooSmallError(pageNumbers[i], paper);
+      }
+      const renderViewport = page.getViewport({ scale });
+
+      canvas.width = Math.floor(renderViewport.width);
+      canvas.height = Math.floor(renderViewport.height);
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({
+        canvasContext: context,
+        viewport: renderViewport,
+        intent: 'print',
+        optionalContentConfigPromise: Promise.resolve(printConfig),
+      }).promise;
+
+      const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+      const rgb = rgbaToRgb(pixels);
+      const deflated = await deflateBytes(rgb);
+
+      // Place the page at its true physical size, centred on the sheet.
+      const drawWidth = round(pointViewport.width);
+      const drawHeight = round(pointViewport.height);
+      const x = round((paperWidth - drawWidth) / 2);
+      const y = round((paperHeight - drawHeight) / 2);
+
+      const id = pageId(i);
+      const contentId = id + 1;
+      const imageId = id + 2;
+
+      writeObject(
+        id,
+        '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + paperWidth + ' ' + paperHeight + ']' +
+          ' /Resources << /XObject << /Im0 ' + imageId + ' 0 R >> >>' +
+          ' /Contents ' + contentId + ' 0 R >>'
+      );
+      writeStream(
+        contentId,
+        '',
+        encodeLatin1('q ' + drawWidth + ' 0 0 ' + drawHeight + ' ' + x + ' ' + y + ' cm /Im0 Do Q')
+      );
+      writeStream(
+        imageId,
+        '/Type /XObject /Subtype /Image /Width ' + canvas.width + ' /Height ' + canvas.height +
+          ' /ColorSpace /DeviceRGB /BitsPerComponent 8' + (deflated ? ' /Filter /FlateDecode' : ''),
+        deflated || rgb
+      );
+    }
+
+    canvas.width = 0;
+    canvas.height = 0;
+
+    const xrefOffset = length;
+    let xref = 'xref\n0 ' + (objectCount + 1) + '\n0000000000 65535 f \n';
+    for (let id = 1; id <= objectCount; id++) {
+      xref += String(offsets[id]).padStart(10, '0') + ' 00000 n \n';
+    }
+    pushText(
+      xref + 'trailer\n<< /Size ' + (objectCount + 1) + ' /Root 1 0 R >>\nstartxref\n' +
+        xrefOffset + '\n%%EOF\n'
+    );
+
+    return new Blob(chunks, { type: 'application/pdf' });
+  }
+
+  let downloadUrl = null;
+
+  async function savePdf(pageNumbers, dpi, paper) {
+    const printConfig = await buildPrintConfig();
+    const blob = await buildPrintablePdf(pageNumbers, dpi, paper, printConfig, (done, total) => {
+      printProgressText.textContent = 'Building page ' + (done + 1) + ' of ' + total + '…';
+      printBar.style.width = Math.round((done / total) * 100) + '%';
+    });
+
+    // Deliberately NOT link.click(): building the PDF takes seconds, and by then
+    // Safari has expired the user-activation window and silently drops a
+    // programmatic download. Handing back a real link the reader clicks works
+    // everywhere and also confirms the file was actually produced.
+    const base = (currentFileName || 'pattern').replace(/\.pdf$/i, '');
+    if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+    downloadUrl = URL.createObjectURL(blob);
+
+    const link = $('pv-download-link');
+    link.href = downloadUrl;
+    link.download = base + ' - print at 100%.pdf';
+    $('pv-open-link').href = downloadUrl;
+
+    const megabytes = blob.size / (1024 * 1024);
+    $('pv-print-ready-detail').textContent =
+      pageNumbers.length + (pageNumbers.length === 1 ? ' page' : ' pages') +
+      ' on ' + paper.label + ', ' +
+      (megabytes < 0.1 ? '<0.1' : megabytes.toFixed(1)) + ' MB';
+  }
+
+</script>
