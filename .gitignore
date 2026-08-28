@@ -7,6 +7,9 @@ dist/
 # Astro
 .astro/
 
+# pdf.js runtime data copied from node_modules by scripts/copy-pdfjs-assets.mjs
+public/pdfjs/
+
 # Environment
 .env
 .env.*
