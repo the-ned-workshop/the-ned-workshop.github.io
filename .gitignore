@@ -10,6 +10,9 @@ dist/
 # pdf.js runtime data copied from node_modules by scripts/copy-pdfjs-assets.mjs
 public/pdfjs/
 
+# Per-event share images composited by scripts/generate-og-images.mjs
+public/images/og/
+
 # Environment
 .env
 .env.*

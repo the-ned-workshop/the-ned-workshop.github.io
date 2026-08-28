@@ -12,7 +12,12 @@ export async function getStaticPaths() {
 
 const { event } = Astro.props;
 
+// The photo as it appears on the page.
 const eventImage = event.image ? event.image.replace(/^\/public/, '') : '/images/meta-image.jpg';
+
+// The share image: the same photo with the wordmark composited onto it by
+// scripts/generate-og-images.mjs at build time. Only used in meta tags, never on the page.
+const shareImage = event.image ? `/images/og/${event.slug}.jpg` : '/images/meta-image.jpg';
 
 // Format date for JSON-LD (ISO 8601)
 const eventDateStr = event.date.toISOString().split('T')[0];
@@ -62,7 +67,7 @@ const eventJsonLd = {
     }
   }),
   ...(event.image && {
-    "image": `https://nedworkshop.org${eventImage}`
+    "image": `https://nedworkshop.org${shareImage}`
   })
 };
 ---
@@ -70,7 +75,7 @@ const eventJsonLd = {
 <BaseLayout
   title={event.title}
   description={stripDescriptionLinks(event.description).slice(0, 160)}
-  image={eventImage}
+  image={shareImage}
   type="article"
   jsonLd={eventJsonLd}
 >
