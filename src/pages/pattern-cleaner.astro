@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const description =
-  'Clean up a scanned embroidery or craft pattern in your browser: remove the paper background and shadows, then print the lines in black, water-erasable blue, or any color you choose. Nothing is uploaded.';
+  'Remove the gray paper background from a scanned embroidery pattern, then print the lines in light blue, black, or any color you choose.';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -18,12 +18,13 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title="Pattern Scan Cleaner" description={description} jsonLd={jsonLd}>
+<BaseLayout title="Clean Up a Scanned Embroidery Pattern" description={description} jsonLd={jsonLd}>
   <!-- Page header -->
   <section class="bg-amber-50 py-10 border-b-2 border-amber-200">
     <div class="max-w-6xl mx-auto px-6 text-center">
-      <h1 class="text-4xl md:text-6xl font-extrabold text-amber-700">
-        Pattern Scan Cleaner
+      <p class="text-xs font-extrabold uppercase tracking-wider text-stone-500">Pattern Scan Cleaner</p>
+      <h1 class="mt-2 text-4xl md:text-6xl font-extrabold text-amber-700">
+        Clean Up a Scanned Embroidery Pattern
       </h1>
       <p class="mt-4 text-lg md:text-2xl text-stone-700 font-semibold">
         Drop the paper background. Keep the lines. Pick their color.

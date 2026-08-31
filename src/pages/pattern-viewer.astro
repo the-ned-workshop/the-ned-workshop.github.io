@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const description =
-  'Open a layered PDF sewing pattern in your browser, turn size layers on and off, and print just the sizes you need at true 1:1 scale. No Adobe Acrobat required, and your file never leaves your device.';
+  'Open a layered PDF sewing pattern, switch off the sizes you are not cutting, and print yours at true 1:1 scale. No Acrobat, nothing uploaded.';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -18,12 +18,13 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title="PDF Pattern Layer Viewer" description={description} jsonLd={jsonLd}>
+<BaseLayout title="Print One Size From a Layered PDF Pattern" description={description} jsonLd={jsonLd}>
   <!-- Page header -->
   <section class="bg-amber-50 py-10 border-b-2 border-amber-200">
     <div class="max-w-6xl mx-auto px-6 text-center">
-      <h1 class="text-4xl md:text-6xl font-extrabold text-amber-700">
-        PDF Pattern Layer Viewer
+      <p class="text-xs font-extrabold uppercase tracking-wider text-stone-500">PDF Pattern Layer Viewer</p>
+      <h1 class="mt-2 text-4xl md:text-6xl font-extrabold text-amber-700">
+        Print One Size From a Layered PDF Pattern
       </h1>
       <p class="mt-4 text-lg md:text-2xl text-stone-700 font-semibold">
         Pick your size. Print it at 1:1. No Acrobat needed.
