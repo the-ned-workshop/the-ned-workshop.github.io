@@ -3,8 +3,8 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "node scripts/copy-pdfjs-assets.mjs && node scripts/generate-og-images.mjs && astro dev",
-    "build": "node scripts/copy-pdfjs-assets.mjs && node scripts/generate-og-images.mjs && astro build",
+    "dev": "node scripts/copy-pdfjs-assets.mjs && node scripts/generate-og-images.mjs && node scripts/generate-tool-og-images.mjs && astro dev",
+    "build": "node scripts/copy-pdfjs-assets.mjs && node scripts/generate-og-images.mjs && node scripts/generate-tool-og-images.mjs && astro build",
     "preview": "astro preview",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "brand:social": "node scripts/generate-social-logos.mjs"
