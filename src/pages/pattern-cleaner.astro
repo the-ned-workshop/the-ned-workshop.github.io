@@ -4,17 +4,62 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const description =
   'Remove the gray paper background from a scanned embroidery pattern, then print the lines in light blue, black, or any color you choose.';
 
+// One source for the visible Q&A and the FAQPage structured data, so the two
+// cannot drift apart — Google drops FAQ markup that has no on-page counterpart.
+const faqs = [
+  {
+    q: 'Is my scan uploaded anywhere?',
+    a: 'No. The file is read and redrawn by your own browser, and there is no server behind this page to send it to. Nothing is uploaded and nothing is stored — you can disconnect from the internet after the page loads and the tool still works.',
+  },
+  {
+    q: 'Why print the lines in light blue?',
+    a: 'Pale lines are much easier to hide under stitches than black ones, whether you trace the printout onto fabric over a lightbox or print onto a printable fabric sheet. One caveat: printer ink is not water-erasable. If you need the marks to disappear afterwards rather than be covered, use the printout as a tracing guide and mark the fabric with a water-erasable pen.',
+  },
+  {
+    q: 'The lines came out faint or broken. What do I change?',
+    a: 'Drag the line pickup slider to the right. That tells the tool to keep marks that are only slightly darker than the paper around them, which is what catches faint pencil and worn book printing.',
+  },
+  {
+    q: 'There are specks of paper texture all over the page.',
+    a: 'Drag the line pickup slider to the left. The tool then keeps only the marks that are clearly darker than the surrounding paper, and the texture drops away with them.',
+  },
+  {
+    q: 'Can I use a phone photo instead of a scanner?',
+    a: 'Yes. The tool judges each pixel against the paper immediately around it rather than against one brightness for the whole page, so uneven lighting and the shadow near a book gutter still flatten out. Lay the page as flat as you can and keep your own shadow off it.',
+  },
+  {
+    q: 'What files can I open, and what do I get back?',
+    a: 'You can open a PDF — every page is processed — or a PNG, JPEG, or WebP image. You get back a multi-page PDF at the original page size, or a PNG per page, with an option for a transparent background instead of white.',
+  },
+  {
+    q: 'Can I use this on patterns from a book I own?',
+    a: 'Cleaning up a scan of a pattern you own for your own stitching is ordinary personal use. Please do not use it to redistribute someone else’s pattern.',
+  },
+];
+
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'Pattern Scan Cleaner',
-  url: 'https://nedworkshop.org/pattern-cleaner',
-  applicationCategory: 'UtilitiesApplication',
-  operatingSystem: 'Any (web browser)',
-  browserRequirements: 'Requires JavaScript.',
-  description,
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  publisher: { '@type': 'Organization', name: 'The Ned Workshop' },
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Pattern Scan Cleaner',
+      url: 'https://nedworkshop.org/pattern-cleaner',
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Any (web browser)',
+      browserRequirements: 'Requires JavaScript.',
+      description,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      publisher: { '@id': 'https://nedworkshop.org/#organization' },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faqs.map(({ q, a }) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    },
+  ],
 };
 ---
 
@@ -173,6 +218,21 @@ const jsonLd = {
         Please use it with patterns you have the right to copy for personal use &mdash; your own
         drawings, patterns from books you own, or free patterns.
       </p>
+    </div>
+  </section>
+
+  <!-- Common questions -->
+  <section class="py-14 bg-amber-100 border-t-2 border-amber-200">
+    <div class="max-w-3xl mx-auto px-6">
+      <h2 class="text-3xl font-extrabold text-amber-700">Common questions</h2>
+      <div class="mt-6 space-y-6">
+        {faqs.map(({ q, a }) => (
+          <div>
+            <h3 class="text-lg font-extrabold text-stone-800">{q}</h3>
+            <p class="mt-1 text-stone-700 font-medium">{a}</p>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 </BaseLayout>

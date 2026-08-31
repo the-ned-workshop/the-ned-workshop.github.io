@@ -4,17 +4,60 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const description =
   'Open a layered PDF sewing pattern, switch off the sizes you are not cutting, and print yours at true 1:1 scale. No Acrobat, nothing uploaded.';
 
+// One source for the visible Q&A and the FAQPage structured data, so the two
+// cannot drift apart — Google drops FAQ markup that has no on-page counterpart.
+// Most of this was already written as helper text inside the print dialog and
+// the empty states, where it only appears mid-task.
+const faqs = [
+  {
+    q: 'Do I need Adobe Acrobat to print one size?',
+    a: 'No. Layer switches are a standard PDF feature, but most readers — including the one built into your browser and the Preview app on a Mac — do not expose them, which is why the usual advice is to install Acrobat. This page reads the same layer information and shows you the switches directly.',
+  },
+  {
+    q: 'Is my pattern uploaded anywhere?',
+    a: 'No. The PDF is read off your disk by your own browser, and there is no server behind this page to send it to. Nothing is uploaded and nothing is stored.',
+  },
+  {
+    q: 'My test square printed blank. What went wrong?',
+    a: 'The pattern keeps its test square on a layer you have switched off. Turn a shared layer such as “All Sizes” back on and print the square again — those layers usually hold the square, the notches, and the grainlines as well as the outlines.',
+  },
+  {
+    q: 'The PDF has no layers in it. Can I still use this?',
+    a: 'Yes, though there will be nothing to switch on or off. A pattern with no layers is usually a single-size pattern, or one whose sizes were flattened before it was saved. You can still view it and print it at true 1:1 scale from here.',
+  },
+  {
+    q: 'Why does it matter that I print at Actual Size?',
+    a: 'A PDF carries its own page size, so a printer set to “Fit to page” will quietly shrink it by a few percent to clear its own unprintable margin, and every seam allowance shrinks with it. Printing at Actual Size, or 100%, is what keeps the pattern true. Print the test square first and measure it with a ruler before committing paper to the rest.',
+  },
+  {
+    q: 'Which layers should I leave switched on?',
+    a: 'Turn off the sizes you are not cutting — they are usually named something like “Size 12” or grouped by paper size such as “A4 / Letter”. Leave on anything holding the outlines, notches, grainlines, or a shared “All Sizes” layer, or you will print a page with pieces missing.',
+  },
+];
+
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'PDF Pattern Layer Viewer',
-  url: 'https://nedworkshop.org/pattern-viewer',
-  applicationCategory: 'UtilitiesApplication',
-  operatingSystem: 'Any (web browser)',
-  browserRequirements: 'Requires JavaScript.',
-  description,
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  publisher: { '@type': 'Organization', name: 'The Ned Workshop' },
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'PDF Pattern Layer Viewer',
+      url: 'https://nedworkshop.org/pattern-viewer',
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Any (web browser)',
+      browserRequirements: 'Requires JavaScript.',
+      description,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      publisher: { '@id': 'https://nedworkshop.org/#organization' },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faqs.map(({ q, a }) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    },
+  ],
 };
 ---
 
@@ -300,6 +343,21 @@ const jsonLd = {
       <p class="mt-6 text-sm text-stone-600 font-medium">
         Stuck on a pattern? <a href="mailto:info@nedworkshop.org" class="font-bold text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300">Drop us an email</a>.
       </p>
+    </div>
+  </section>
+
+  <!-- Common questions -->
+  <section class="py-14 bg-amber-100 border-t-2 border-amber-200">
+    <div class="max-w-3xl mx-auto px-6">
+      <h2 class="text-3xl font-extrabold text-amber-700">Common questions</h2>
+      <div class="mt-6 space-y-6">
+        {faqs.map(({ q, a }) => (
+          <div>
+            <h3 class="text-lg font-extrabold text-stone-800">{q}</h3>
+            <p class="mt-1 text-stone-700 font-medium">{a}</p>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 </BaseLayout>
