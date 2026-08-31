@@ -23,9 +23,13 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const fullTitle = title.includes('The Ned Workshop') ? title : `${title} | The Ned Workshop`;
 const ogImage = image.startsWith('http') ? image : new URL(image, siteOrigin).toString();
 
+// The `@id` gives page-level structured data something to point at, so a page
+// can say `publisher: { '@id': ... }` and have it resolve to this node instead
+// of restating the organization as a second, unrelated copy.
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": "https://nedworkshop.org/#organization",
   "name": "The Ned Workshop",
   "description": "Enable the community to repair and create through educational skill building workshops and access to tools.",
   "url": "https://nedworkshop.org",
