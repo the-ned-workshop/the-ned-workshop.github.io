@@ -65,6 +65,12 @@ const costDigits = event.cost.match(/[\d.]+/);
 const offerPrice = event.cost.toUpperCase() === 'FREE' || !costDigits ? '0' : costDigits[0];
 const isFree = offerPrice === '0';
 
+// The share image is 1200x630; the event photo is the square crop shown on the
+// page. Offering both gives Google two aspect ratios to choose between.
+const jsonLdImages = event.image
+  ? [`https://nedworkshop.org${shareImage}`, `https://nedworkshop.org${eventImage}`]
+  : ["https://nedworkshop.org/images/meta-image.jpg"];
+
 const eventJsonLd = {
   "@context": "https://schema.org",
   "@type": "Event",
@@ -91,9 +97,7 @@ const eventJsonLd = {
     "availability": "https://schema.org/InStock",
     "url": `https://nedworkshop.org/events/${event.slug}`
   },
-  ...(event.image && {
-    "image": `https://nedworkshop.org${shareImage}`
-  })
+  "image": jsonLdImages
 };
 ---
 
