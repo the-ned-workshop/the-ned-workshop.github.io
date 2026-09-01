@@ -5,6 +5,10 @@ startTime: "10:00 AM"
 endTime: "2:00 PM"
 location: Nederland Farmers Market
 locationUrl: https://www.google.com/maps/search/?api=1&query=80+E+2nd+St+Nederland+CO+80466
+locationStreet: 80 E 2nd St
+locationLocality: Nederland
+locationRegion: CO
+locationPostalCode: 80466
 cost: FREE
 ---
 

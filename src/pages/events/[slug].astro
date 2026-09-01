@@ -37,6 +37,18 @@ function parseTime(timeStr: string, dateStr: string): string {
 const startDateTime = parseTime(event.startTime, eventDateStr);
 const endDateTime = parseTime(event.endTime, eventDateStr);
 
+// Venue address. We publish the town for every event and a street address only
+// where one is set in the event's frontmatter, so nothing private leaks into
+// structured data by default.
+const locationAddress = {
+  "@type": "PostalAddress",
+  ...(event.locationStreet && { "streetAddress": event.locationStreet }),
+  "addressLocality": event.locationLocality,
+  "addressRegion": event.locationRegion,
+  ...(event.locationPostalCode && { "postalCode": event.locationPostalCode }),
+  "addressCountry": "US"
+};
+
 const eventJsonLd = {
   "@context": "https://schema.org",
   "@type": "Event",
@@ -47,6 +59,7 @@ const eventJsonLd = {
   "location": {
     "@type": "Place",
     "name": event.location,
+    "address": locationAddress,
     ...(event.locationUrl && { "url": event.locationUrl })
   },
   "organizer": {

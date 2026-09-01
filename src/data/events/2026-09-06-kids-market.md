@@ -5,6 +5,10 @@ startTime: "10:00 AM"
 endTime: "12:00 PM"
 location: Nederland Farmers Mini Market
 locationUrl: https://www.google.com/maps/search/?api=1&query=80+E+2nd+St+Nederland+CO+80466
+locationStreet: 80 E 2nd St
+locationLocality: Nederland
+locationRegion: CO
+locationPostalCode: 80466
 cost: FREE
 image: /public/images/events/2026-09-06-kids-market/flyer.png
 images: /public/images/events/2026-09-06-kids-market/flyer.png|Kids Market flyer for September 6 at the Nederland Farmers Mini Market

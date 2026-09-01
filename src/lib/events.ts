@@ -11,6 +11,13 @@ export interface Event {
   endTime: string;
   location: string;
   locationUrl?: string;
+  // Venue address for the Event structured data. Street and postal code are
+  // optional on purpose: leave them out for any location we don't want to
+  // publish, and the address falls back to the town it's in.
+  locationStreet?: string;
+  locationLocality: string;
+  locationRegion: string;
+  locationPostalCode?: string;
   cost: string;
   costNote?: string;
   image?: string;
@@ -70,6 +77,10 @@ export async function getEvents(): Promise<Event[]> {
       endTime: data.endTime ?? '',
       location: data.location ?? '',
       locationUrl: data.locationUrl,
+      locationStreet: data.locationStreet,
+      locationLocality: data.locationLocality || 'Nederland',
+      locationRegion: data.locationRegion || 'CO',
+      locationPostalCode: data.locationPostalCode,
       cost: data.cost ?? '',
       costNote: data.costNote,
       image: data.image,

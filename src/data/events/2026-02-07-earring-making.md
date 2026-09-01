@@ -5,6 +5,8 @@ startTime: "1:00 PM"
 endTime: "3:00 PM"
 location: Ned General
 locationUrl: https://www.google.com/maps/place/Ned+General/@39.9616,-105.5108,17z
+locationLocality: Nederland
+locationRegion: CO
 cost: FREE
 costNote: all supplies provided
 image: /public/images/hearts.jpeg
