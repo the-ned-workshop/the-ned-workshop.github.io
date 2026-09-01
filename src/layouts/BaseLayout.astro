@@ -35,10 +35,14 @@ const organizationJsonLd = {
   "url": "https://nedworkshop.org",
   "logo": "https://nedworkshop.org/images/logo.svg",
   "email": "info@nedworkshop.org",
+  // No street address on purpose — the business address is a home address.
+  // The postal code is safe to publish: 80466 covers all of Nederland, so it
+  // says nothing the locality doesn't already.
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Nederland",
     "addressRegion": "CO",
+    "postalCode": "80466",
     "addressCountry": "US"
   },
   "sameAs": []
