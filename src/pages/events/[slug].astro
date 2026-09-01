@@ -22,16 +22,31 @@ const shareImage = event.image ? `/images/og/${event.slug}.jpg` : '/images/meta-
 // Format date for JSON-LD (ISO 8601)
 const eventDateStr = event.date.toISOString().split('T')[0];
 
-// Parse time to create ISO datetime
+// Nederland's UTC offset on a given date. Mountain time shifts by an hour
+// across the DST boundary, so it has to be looked up per event rather than
+// hard-coded. Noon UTC is far enough from the 2am transition to land on the
+// right side of it either way.
+function mountainOffset(dateStr: string): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Denver',
+    timeZoneName: 'longOffset',
+  }).formatToParts(new Date(`${dateStr}T12:00:00Z`));
+  return parts.find((part) => part.type === 'timeZoneName')?.value.replace('GMT', '') ?? '-07:00';
+}
+
+// Parse time to create ISO datetime. The offset matters: an unstamped time is
+// read as the reader's own timezone, which shows the wrong hour to anyone
+// outside Colorado.
 function parseTime(timeStr: string, dateStr: string): string {
+  const offset = mountainOffset(dateStr);
   const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (!match) return `${dateStr}T12:00:00`;
+  if (!match) return `${dateStr}T12:00:00${offset}`;
   let hours = parseInt(match[1]);
   const minutes = match[2];
   const period = match[3].toUpperCase();
   if (period === 'PM' && hours !== 12) hours += 12;
   if (period === 'AM' && hours === 12) hours = 0;
-  return `${dateStr}T${hours.toString().padStart(2, '0')}:${minutes}:00`;
+  return `${dateStr}T${hours.toString().padStart(2, '0')}:${minutes}:00${offset}`;
 }
 
 const startDateTime = parseTime(event.startTime, eventDateStr);
