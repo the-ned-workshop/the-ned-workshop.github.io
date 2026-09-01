@@ -37,6 +37,16 @@ function parseTime(timeStr: string, dateStr: string): string {
 const startDateTime = parseTime(event.startTime, eventDateStr);
 const endDateTime = parseTime(event.endTime, eventDateStr);
 
+// Every event is put on by the workshop itself, so it is both the organizer
+// and the performer. The `@id` points at the Organization node BaseLayout
+// emits, so search engines resolve one organization rather than three copies.
+const organization = {
+  "@type": "Organization",
+  "@id": "https://nedworkshop.org/#organization",
+  "name": "The Ned Workshop",
+  "url": "https://nedworkshop.org"
+};
+
 // Venue address. We publish the town for every event and a street address only
 // where one is set in the event's frontmatter, so nothing private leaks into
 // structured data by default.
@@ -69,11 +79,8 @@ const eventJsonLd = {
     "address": locationAddress,
     ...(event.locationUrl && { "url": event.locationUrl })
   },
-  "organizer": {
-    "@type": "Organization",
-    "name": "The Ned Workshop",
-    "url": "https://nedworkshop.org"
-  },
+  "organizer": organization,
+  "performer": organization,
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
   "isAccessibleForFree": isFree,
