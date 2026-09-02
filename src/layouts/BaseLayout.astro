@@ -31,15 +31,29 @@ const ogImage = image.startsWith('http') ? image : new URL(image, siteOrigin).to
 // The `@id` gives page-level structured data something to point at, so a page
 // can say `publisher: { '@id': ... }` and have it resolve to this node instead
 // of restating the organization as a second, unrelated copy.
+//
+// NGO rather than plain Organization: it is a subtype Google understands, and it
+// is what we actually are.
 const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "NGO",
   "@id": "https://nedworkshop.org/#organization",
   "name": "The Ned Workshop",
+  "alternateName": "Ned Workshop",
   "description": "Enable the community to repair and create through educational skill building workshops and access to tools.",
   "url": "https://nedworkshop.org",
-  "logo": "https://nedworkshop.org/images/logo.svg",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://nedworkshop.org/images/logo.svg",
+    "width": 1200,
+    "height": 264
+  },
+  "image": "https://nedworkshop.org/images/meta-image.jpg",
   "email": "info@nedworkshop.org",
+  "nonprofitStatus": "Nonprofit501c3",
+  "areaServed": {
+    "@type": "Place",
+    "name": "Nederland, Colorado"
+  },
   // No street address on purpose — the business address is a home address.
   // The postal code is safe to publish: 80466 covers all of Nederland, so it
   // says nothing the locality doesn't already.
@@ -50,7 +64,30 @@ const organizationJsonLd = {
     "postalCode": "80466",
     "addressCountry": "US"
   },
-  "sameAs": []
+  // These are how Google ties nedworkshop.org, the Instagram account and the
+  // Facebook page together as one entity rather than three strangers.
+  "sameAs": [
+    "https://www.instagram.com/thenedworkshop/",
+    "https://www.facebook.com/profile.php?id=61572569387423",
+    "https://www.youtube.com/@TheNedWorkshop"
+  ]
+};
+
+// The line above a search result is the domain ("nedworkshop.org") until a WebSite
+// node names the site; then Google can show "The Ned Workshop" there instead. It has
+// to point at the root of the domain, and Google reads it from the home page.
+const webSiteJsonLd = {
+  "@type": "WebSite",
+  "@id": "https://nedworkshop.org/#website",
+  "name": "The Ned Workshop",
+  "alternateName": "Ned Workshop",
+  "url": "https://nedworkshop.org/",
+  "publisher": { "@id": "https://nedworkshop.org/#organization" }
+};
+
+const siteJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [organizationJsonLd, webSiteJsonLd]
 };
 ---
 
@@ -110,7 +147,7 @@ const organizationJsonLd = {
     )}
 
     <!-- Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
+    <script type="application/ld+json" set:html={JSON.stringify(siteJsonLd)} />
     {jsonLd && (
       <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     )}
