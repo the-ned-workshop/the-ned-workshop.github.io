@@ -93,7 +93,7 @@ const eventJsonLd = {
   "description": stripDescriptionLinks(event.description),
   "startDate": startDateTime,
   "endDate": endDateTime,
-  "url": `https://nedworkshop.org/events/${event.slug}`,
+  "url": `https://nedworkshop.org/events/${event.slug}/`,
   "location": {
     "@type": "Place",
     "name": event.location,
@@ -110,7 +110,7 @@ const eventJsonLd = {
     "price": offerPrice,
     "priceCurrency": "USD",
     "availability": "https://schema.org/InStock",
-    "url": `https://nedworkshop.org/events/${event.slug}`
+    "url": `https://nedworkshop.org/events/${event.slug}/`
   },
   "image": jsonLdImages
 };
@@ -122,6 +122,10 @@ const eventJsonLd = {
   image={shareImage}
   type="article"
   jsonLd={eventJsonLd}
+  breadcrumbs={[
+    { name: 'Events', url: '/events' },
+    { name: event.title, url: `/events/${event.slug}` },
+  ]}
 >
   <section class="bg-amber-50 py-8">
     <div class="max-w-5xl mx-auto px-6">

@@ -8,6 +8,8 @@ interface Props {
   image?: string;
   type?: 'website' | 'article';
   jsonLd?: object;
+  /** The trail below Home, ending with this page. Home is added automatically. */
+  breadcrumbs?: { name: string; url: string }[];
 }
 
 const {
@@ -20,7 +22,8 @@ const {
   description = 'The Ned Workshop is a nonprofit tool library and community workshop in Nederland, Colorado. Borrow tools, learn to sew, knit, mend, and make.',
   image = '/images/meta-image.jpg',
   type = 'website',
-  jsonLd
+  jsonLd,
+  breadcrumbs
 } = Astro.props;
 
 const siteOrigin = import.meta.env.DEV ? Astro.url.origin : Astro.site;
@@ -85,9 +88,29 @@ const webSiteJsonLd = {
   "publisher": { "@id": "https://nedworkshop.org/#organization" }
 };
 
+// Breadcrumbs replace the bare URL under the title with a readable path
+// (nedworkshop.org > Events > ...). Home is the same on every page, so it is added
+// here rather than repeated by every caller.
+const trail = [{ name: 'Home', url: '/' }, ...(breadcrumbs ?? [])];
+// Every canonical URL on this site ends in a slash, so the crumbs point at the
+// same URLs rather than at the redirects to them.
+const crumbUrl = (path: string) =>
+  new URL(path.endsWith('/') ? path : `${path}/`, 'https://nedworkshop.org').toString();
+const breadcrumbJsonLd = breadcrumbs?.length
+  ? {
+      "@type": "BreadcrumbList",
+      "itemListElement": trail.map((crumb, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "name": crumb.name,
+        "item": crumbUrl(crumb.url)
+      }))
+    }
+  : null;
+
 const siteJsonLd = {
   "@context": "https://schema.org",
-  "@graph": [organizationJsonLd, webSiteJsonLd]
+  "@graph": [organizationJsonLd, webSiteJsonLd, ...(breadcrumbJsonLd ? [breadcrumbJsonLd] : [])]
 };
 ---
 

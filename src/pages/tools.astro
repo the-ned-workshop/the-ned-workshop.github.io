@@ -14,7 +14,7 @@ const toolsByCategory = tools.reduce<Record<string, typeof tools>>((acc, tool) =
 }, {});
 ---
 
-<BaseLayout title="Tool Library" description={description}>
+<BaseLayout title="Tool Library" description={description} breadcrumbs={[{ name: 'Tool Library', url: '/tools' }]}>
   <!-- Page Header -->
   <section class="bg-amber-50 py-10">
     <div class="max-w-5xl mx-auto px-6 text-center">
