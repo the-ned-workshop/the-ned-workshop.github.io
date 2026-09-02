@@ -88,6 +88,26 @@ const shopPatch = (S, padX) =>
     radius: 1.2 * S,
   });
 
+/**
+ * A single-glyph mark for small square slots — the favicon and the app icon.
+ *
+ * The full lockup is three words of Titan One; below about 48px it collapses into
+ * three unreadable smudges, which is what Google renders next to a search result.
+ * So the icon keeps only the two parts that survive: the starburst and an N.
+ */
+function iconMark(size) {
+  const burst = size * 0.98;
+  const inset = (size - burst) / 2;
+  const n = patch('N', size * 0.46, 0, 0, { fill: COLORS.ink, bg: null });
+  return (
+    `<rect width="${size}" height="${size}" fill="${COLORS.quilt}"/>` +
+    `<g transform="rotate(-6 ${(size / 2).toFixed(2)} ${(size / 2).toFixed(2)}) translate(${inset.toFixed(2)} ${inset.toFixed(2)})">` +
+    starburst(burst, COLORS.pink) +
+    `</g>` +
+    `<g transform="translate(${((size - n.w) / 2).toFixed(2)} ${((size - n.h) / 2).toFixed(2)})">${n.svg}</g>`
+  );
+}
+
 /** One row: the ★ NED workshop, on the green field. */
 function wideLockup(S) {
   const gap = 1.1 * S;
@@ -147,4 +167,4 @@ const doc = (w, h, body, title) =>
   `<title>${title}</title>${body}</svg>\n`;
 
 
-export { COLORS, wideLockup, stackedLockup, doc };
+export { COLORS, iconMark, wideLockup, stackedLockup, doc };

@@ -82,6 +82,9 @@ const organizationJsonLd = {
     <meta name="twitter:image" content={ogImage} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Google fetches and rasterizes the favicon itself and asks for a square
+         multiple of 48px, so give it a PNG rather than hoping it renders the SVG well. -->
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
