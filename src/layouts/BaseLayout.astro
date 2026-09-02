@@ -12,7 +12,12 @@ interface Props {
 
 const {
   title,
-  description = 'Enable the community to repair and create through educational skill building workshops and access to tools.',
+  // Google writes the snippet from whichever text answers the query, but it only
+  // reaches for the meta description when that description says something concrete.
+  // The mission statement on its own ("Enable the community to...") reads as a
+  // sentence fragment about nobody in particular, so this one names us, says where
+  // we are, and lists what a person can actually do with us.
+  description = 'The Ned Workshop is a nonprofit tool library and community workshop in Nederland, Colorado. Borrow tools, learn to sew, knit, mend, and make.',
   image = '/images/meta-image.jpg',
   type = 'website',
   jsonLd
