@@ -20,6 +20,6 @@ All of ¾ inch plywood was purchased second-hand at Resource Central in Boulder.
 
 This workshop is designed for all ages, sizes, and genders.
 
-Come create with us at the Farmers Market on June 21st from 10am - 2pm!
+Come create with us at the [Farmers Market](https://www.nederlandfarmersmarket.org) on June 21st from 10am - 2pm!
 
 Making is free, donations appreciated when possible.

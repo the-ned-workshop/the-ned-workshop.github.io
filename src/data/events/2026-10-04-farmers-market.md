@@ -12,4 +12,4 @@ locationPostalCode: 80466
 cost: FREE
 ---
 
-Stop by The Ned Workshop's booth at the Nederland Farmers Market! Come say hi, learn about our tool library and upcoming workshops, and chat with us about how to get involved.
+Stop by The Ned Workshop's booth at the [Nederland Farmers Market](https://www.nederlandfarmersmarket.org)! Come say hi, learn about our tool library and upcoming workshops, and chat with us about how to get involved.

@@ -13,7 +13,7 @@ cost: FREE
 image: /public/images/events/2026-09-06-kids-market/flyer.png
 images: /public/images/events/2026-09-06-kids-market/flyer.png|Kids Market flyer for September 6 at the Nederland Farmers Mini Market
 ---
-The Ned Workshop is teaming up with the Nederland Farmers (Mini) Market for a Kids Market on Sunday, September 6 from 10am–12pm!
+The Ned Workshop is teaming up with the [Nederland Farmers (Mini) Market](https://www.nederlandfarmersmarket.org) for a Kids Market on Sunday, September 6 from 10am–12pm!
 
 Kiddos ages 8–14 will get to take charge, sell their own handmade creations, and keep 100% of the money they earn.
 

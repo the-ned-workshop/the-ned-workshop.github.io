@@ -20,6 +20,6 @@ All of the tulle and supplies used in this workshop were donated or purchased se
 
 This workshop is designed for all ages, sizes, and genders.
 
-Come create with us at the Farmers Market on May 24th from 10am - 2pm!
+Come create with us at the [Farmers Market](https://www.nederlandfarmersmarket.org) on May 24th from 10am - 2pm!
 
 Making is free, donations appreciated when possible.
