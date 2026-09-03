@@ -100,7 +100,9 @@ function iconMark(size) {
   const inset = (size - burst) / 2;
   const n = patch('N', size * 0.46, 0, 0, { fill: COLORS.ink, bg: null });
   return (
-    `<rect width="${size}" height="${size}" fill="${COLORS.quilt}"/>` +
+    // Cream rather than the quilt green the lockup sits on: at 16px so little of the
+    // ground shows around the starburst that a dark one just reads as a black chip.
+    `<rect width="${size}" height="${size}" fill="${COLORS.cream}"/>` +
     `<g transform="rotate(-6 ${(size / 2).toFixed(2)} ${(size / 2).toFixed(2)}) translate(${inset.toFixed(2)} ${inset.toFixed(2)})">` +
     starburst(burst, COLORS.pink) +
     `</g>` +
