@@ -14,7 +14,7 @@ const toolsByCategory = tools.reduce<Record<string, typeof tools>>((acc, tool) =
 }, {});
 ---
 
-<BaseLayout title="Tool Library" description={description} breadcrumbs={[{ name: 'Tool Library', url: '/tools' }]}>
+<BaseLayout title="Tool Library" description={description} breadcrumbs={[{ name: 'Tool Library', url: '/tools/' }]}>
   <!-- Page Header -->
   <section class="bg-amber-50 py-10">
     <div class="max-w-5xl mx-auto px-6 text-center">
@@ -31,7 +31,7 @@ const toolsByCategory = tools.reduce<Record<string, typeof tools>>((acc, tool) =
   <section class="bg-amber-50 pb-12">
     <div class="max-w-5xl mx-auto px-6">
       <a
-        href="/pattern-viewer"
+        href="/pattern-viewer/"
         class="group block bg-white/80 rounded-2xl border-2 border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 p-6 sm:p-8"
       >
         <div class="flex items-start gap-5">
@@ -53,7 +53,7 @@ const toolsByCategory = tools.reduce<Record<string, typeof tools>>((acc, tool) =
       </a>
 
       <a
-        href="/pattern-cleaner"
+        href="/pattern-cleaner/"
         class="group block mt-5 bg-white/80 rounded-2xl border-2 border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 p-6 sm:p-8"
       >
         <div class="flex items-start gap-5">

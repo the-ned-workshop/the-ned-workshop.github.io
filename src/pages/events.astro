@@ -12,7 +12,7 @@ const pastEvents = events.filter((e) => e.date < now).sort((a, b) => b.date.getT
 const description = "Upcoming classes, open workshop hours, and a history of past events at The Ned Workshop in Nederland, Colorado.";
 ---
 
-<BaseLayout title="Events" description={description} breadcrumbs={[{ name: 'Events', url: '/events' }]}>
+<BaseLayout title="Events" description={description} breadcrumbs={[{ name: 'Events', url: '/events/' }]}>
   <section class="bg-amber-50 py-10">
     <div class="max-w-5xl mx-auto px-6 text-center">
       <h1 class="text-5xl md:text-6xl font-extrabold text-amber-700">Events</h1>
@@ -48,7 +48,7 @@ const description = "Upcoming classes, open workshop hours, and a history of pas
         <div class="space-y-4">
           {pastEvents.map((event) => (
             <a
-              href={`/events/${event.slug}`}
+              href={`/events/${event.slug}/`}
               class="block bg-white/70 rounded-2xl border border-amber-300 hover:border-amber-500 hover:bg-white/90 transition-all duration-300 group overflow-hidden"
             >
               <div class="flex flex-col md:flex-row md:items-center md:gap-4 md:p-5">
