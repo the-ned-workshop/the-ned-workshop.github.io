@@ -14,7 +14,11 @@ export default defineConfig({
   integrations: [
     tailwind(),
     sitemap({
-      filter: (page) => !page.includes('/event-photo-generator'),
+      // Both of these tell Google not to index them — the generator is `noindex,
+      // nofollow`, and /donate is a `noindex` bounce to Givebutter — so listing
+      // them in the sitemap only asks for a page we have already said to skip.
+      filter: (page) =>
+        !page.includes('/event-photo-generator') && !page.includes('/donate'),
     }),
   ],
 });
