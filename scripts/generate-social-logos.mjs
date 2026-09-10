@@ -77,9 +77,11 @@ writeFileSync(out('logo-tile.svg'), tile(1024, 0.84));
 await png(circleSafeTile(1024), 1024, 1024).toFile(out('profile-circle-safe-1024.png'));
 await png(tile(1024, 0.84), 1024, 1024).toFile(out('profile-square-1024.png'));
 
-// Transparent wordmark, for overlaying on photos or print
+// The wordmark on its green plate. Not a transparent master — the lockup carries its own
+// field, so only the rounded corners are clear; generate-print-assets.mjs makes the version
+// with nothing behind it.
 await png(wideSvg, 2400, Math.round((2400 * wide.h) / wide.w)).toFile(
-  out('wordmark-wide-2400-transparent.png')
+  out('wordmark-wide-on-green-2400.png')
 );
 
 // Covers
@@ -103,7 +105,7 @@ website repo. Re-run it rather than editing these by hand:
 | \`profile-square-1024.png\` | Profile art where the image is *not* circle-cropped. The mark is larger, so the corners would clip under a circle mask. |
 | \`facebook-cover-1640x624.png\` | Facebook page cover. |
 | \`youtube-banner-2560x1440.png\` | YouTube channel banner; the mark sits inside the 1546×423 area that shows on every device. |
-| \`wordmark-wide-2400-transparent.png\` | The lockup with nothing behind it, for overlaying on photos or print. |
+| \`wordmark-wide-on-green-2400.png\` | The lockup on its green plate, for slotting into a light layout. Not transparent — for a master with nothing behind it, and for anything going to a printer, see \`npm run brand:print\`. |
 | \`wordmark-wide.svg\` | Vector master, wide lockup. |
 | \`logo-tile.svg\` | Vector master, square tile. |
 
