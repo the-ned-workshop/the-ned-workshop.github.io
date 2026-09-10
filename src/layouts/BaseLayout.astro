@@ -10,6 +10,12 @@ interface Props {
   jsonLd?: object;
   /** The trail below Home, ending with this page. Home is added automatically. */
   breadcrumbs?: { name: string; url: string }[];
+  /**
+   * Keep the page out of search results. Unlisted pages also need adding to the
+   * sitemap filter in astro.config.mjs — telling Google to skip a page and then
+   * listing it in the sitemap asks for the one thing we just said not to do.
+   */
+  noindex?: boolean;
 }
 
 const {
@@ -23,7 +29,8 @@ const {
   image = '/images/meta-image.jpg',
   type = 'website',
   jsonLd,
-  breadcrumbs
+  breadcrumbs,
+  noindex = false
 } = Astro.props;
 
 const siteOrigin = import.meta.env.DEV ? Astro.url.origin : Astro.site;
@@ -121,6 +128,7 @@ const siteJsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#fffbeb" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- iOS web-app / home-screen -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
