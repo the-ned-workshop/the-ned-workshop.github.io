@@ -7,7 +7,8 @@
     "build": "node scripts/copy-pdfjs-assets.mjs && node scripts/generate-og-images.mjs && node scripts/generate-tool-og-images.mjs && astro build",
     "preview": "astro preview",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
-    "brand:social": "node scripts/generate-social-logos.mjs"
+    "brand:social": "node scripts/generate-social-logos.mjs",
+    "brand:print": "node scripts/generate-print-assets.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.0",
