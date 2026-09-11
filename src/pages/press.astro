@@ -1,0 +1,117 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const description = 'News stories and press coverage about The Ned Workshop, the nonprofit workshop and tool library in Nederland, Colorado.';
+
+interface Story {
+  /** The headline as the outlet printed it. */
+  title: string;
+  /** The outlet's own summary or subhead — their words, not ours. */
+  summary: string;
+  publication: string;
+  author?: string;
+  /** Publication date, YYYY-MM-DD. */
+  date: string;
+  url: string;
+}
+
+// Newest first. To add a story, put it at the top of this list.
+const stories: Story[] = [
+  {
+    title: 'Creative youth light up Kids Mini Market',
+    summary: 'Young artists show up to sell creations, play music',
+    publication: 'The Mountain-Ear',
+    author: 'Libby Chandler',
+    date: '2026-09-09',
+    url: 'https://www.themtnear.com/stories/creative-youth-light-up-kids-mini-market,108038'
+  },
+  {
+    title: 'Party in the Peaks',
+    summary: 'The Nederland Farmers Market hosted Party in the Peaks — food, drinks, crafts, and music',
+    publication: 'The Mountain-Ear',
+    author: 'Dave Gibson',
+    date: '2026-07-25',
+    url: 'https://themtnear.com/stories/party-peaks-food-drink-nederland,102341'
+  }
+];
+
+// A bare `new Date('2026-07-25')` is midnight UTC, which is the evening before in
+// Colorado — so format in UTC and the date reads back the way it was written.
+const formatDate = (date: string) =>
+  new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC'
+  });
+---
+
+<BaseLayout title="Press" description={description} breadcrumbs={[{ name: 'Press', url: '/press/' }]}>
+  <!-- Page Header -->
+  <section class="bg-amber-50 py-10">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-amber-700">
+        Press
+      </h1>
+      <p class="text-lg md:text-xl text-stone-600 font-medium mt-4 max-w-2xl mx-auto">
+        Stories about The Ned Workshop and the people who show up to make things with us.
+      </p>
+    </div>
+  </section>
+
+  <!-- Stories -->
+  <section class="bg-amber-100 py-16">
+    <div class="max-w-5xl mx-auto px-6">
+      <ul class="space-y-6">
+        {stories.map((story) => (
+          <li>
+            <a
+              href={story.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group block bg-amber-50 rounded-2xl border-2 border-amber-200 shadow-md hover:shadow-xl hover:border-amber-400 hover:-translate-y-1 transition-all duration-300 p-6 md:p-8"
+            >
+              <p class="text-sm font-extrabold uppercase tracking-wider text-amber-600">
+                {story.publication}
+                <span aria-hidden="true" class="mx-2 text-amber-400">&bull;</span>
+                <time datetime={story.date} class="text-stone-500">{formatDate(story.date)}</time>
+              </p>
+              <h2 class="text-2xl md:text-3xl font-extrabold text-amber-700 mt-2 group-hover:text-amber-800 transition-colors">
+                {story.title}
+              </h2>
+              <p class="text-lg text-stone-700 font-medium mt-2">
+                {story.summary}
+              </p>
+              {story.author && (
+                <p class="text-base text-stone-500 font-semibold mt-2">
+                  By {story.author}
+                </p>
+              )}
+              <p class="text-base font-bold text-amber-700 mt-4 inline-flex items-center gap-1.5">
+                Read the story
+                <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
+              </p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Media inquiries -->
+  <section class="bg-amber-200 py-16">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-amber-700">
+        Writing About Us?
+      </h2>
+      <div class="text-lg text-stone-700 leading-relaxed font-medium space-y-4">
+        <p>
+          We would love to talk. Email <a href="mailto:info@nedworkshop.org" class="text-amber-700 hover:text-amber-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:decoration-amber-500 transition-colors duration-300">info@nedworkshop.org</a> and we will get you photos, details about an event, or someone to interview.
+        </p>
+        <p>
+          Covered us somewhere we have missed? Send us the link and we will add it here.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
