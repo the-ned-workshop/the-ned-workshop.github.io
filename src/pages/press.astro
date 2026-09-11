@@ -13,6 +13,9 @@ interface Story {
   /** Publication date, YYYY-MM-DD. */
   date: string;
   url: string;
+  /** The story's lead photo, re-hosted here rather than hotlinked from the outlet. */
+  image?: string;
+  imageAlt?: string;
 }
 
 // Newest first. To add a story, put it at the top of this list.
@@ -23,7 +26,9 @@ const stories: Story[] = [
     publication: 'The Mountain-Ear',
     author: 'Libby Chandler',
     date: '2026-09-09',
-    url: 'https://www.themtnear.com/stories/creative-youth-light-up-kids-mini-market,108038'
+    url: 'https://www.themtnear.com/stories/creative-youth-light-up-kids-mini-market,108038',
+    image: '/images/press/kids-mini-market.jpg',
+    imageAlt: 'A young vendor behind a table of hand-tied sage bundles at the Kids Mini Market'
   },
   {
     title: 'Party in the Peaks',
@@ -31,7 +36,9 @@ const stories: Story[] = [
     publication: 'The Mountain-Ear',
     author: 'Dave Gibson',
     date: '2026-07-25',
-    url: 'https://themtnear.com/stories/party-peaks-food-drink-nederland,102341'
+    url: 'https://themtnear.com/stories/party-peaks-food-drink-nederland,102341',
+    image: '/images/press/party-in-the-peaks.jpg',
+    imageAlt: 'Two Ned Workshop volunteers in hand-made cardboard crowns holding up a sewn Ned Workshop banner'
   }
 ];
 
@@ -69,28 +76,59 @@ const formatDate = (date: string) =>
               href={story.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="group block bg-amber-50 rounded-2xl border-2 border-amber-200 shadow-md hover:shadow-xl hover:border-amber-400 hover:-translate-y-1 transition-all duration-300 p-6 md:p-8"
+              class="group block bg-amber-50 rounded-2xl border-2 border-amber-200 shadow-md hover:shadow-xl hover:border-amber-400 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
-              <p class="text-sm font-extrabold uppercase tracking-wider text-amber-600">
-                {story.publication}
-                <span aria-hidden="true" class="mx-2 text-amber-400">&bull;</span>
-                <time datetime={story.date} class="text-stone-500">{formatDate(story.date)}</time>
-              </p>
-              <h2 class="text-2xl md:text-3xl font-extrabold text-amber-700 mt-2 group-hover:text-amber-800 transition-colors">
-                {story.title}
-              </h2>
-              <p class="text-lg text-stone-700 font-medium mt-2">
-                {story.summary}
-              </p>
-              {story.author && (
-                <p class="text-base text-stone-500 font-semibold mt-2">
-                  By {story.author}
-                </p>
+              {/* Same two-image treatment as UpcomingEventCard: full-bleed across the
+                  top on narrow screens, then a thumbnail beside the text from `md` up. */}
+              {story.image && (
+                <img
+                  src={story.image}
+                  alt={story.imageAlt}
+                  loading="lazy"
+                  class="block md:hidden w-full h-44 object-cover"
+                />
               )}
-              <p class="text-base font-bold text-amber-700 mt-4 inline-flex items-center gap-1.5">
-                Read the story
-                <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
-              </p>
+              <div class="p-6 md:p-8">
+                <p class="text-sm font-extrabold uppercase tracking-wider text-amber-600">
+                  {story.publication}
+                  <span aria-hidden="true" class="mx-2 text-amber-400">&bull;</span>
+                  <time datetime={story.date} class="text-stone-500">{formatDate(story.date)}</time>
+                </p>
+                <div class="flex items-stretch gap-6 mt-2">
+                  {story.image && (
+                    /* The photo runs from the top of the headline down to the byline,
+                       whatever the text wraps to, so the text has to set the height and the
+                       photo has to follow it: the image is positioned absolutely so its own
+                       aspect ratio contributes no height of its own, and the box holding it
+                       stretches. A fixed height would only line up at one window width. */
+                    <div class="hidden md:block relative self-stretch flex-shrink-0 w-40 rounded-xl overflow-hidden border-2 border-amber-200 bg-amber-100">
+                      <img
+                        src={story.image}
+                        alt={story.imageAlt}
+                        loading="lazy"
+                        class="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div class="min-w-0 flex-1">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-amber-700 group-hover:text-amber-800 transition-colors">
+                      {story.title}
+                    </h2>
+                    <p class="text-lg text-stone-700 font-medium mt-2">
+                      {story.summary}
+                    </p>
+                    {story.author && (
+                      <p class="text-base text-stone-500 font-semibold mt-2">
+                        By {story.author}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p class="text-base font-bold text-amber-700 mt-4 inline-flex items-center gap-1.5">
+                  Read the story
+                  <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
+                </p>
+              </div>
             </a>
           </li>
         ))}
