@@ -22,6 +22,7 @@ Each event file must include YAML frontmatter with the following fields:
 | `locationUrl` | No | Google Maps or other link to the venue |
 | `cost` | Yes | Cost (e.g., `"FREE"` or `"$20"`) |
 | `costNote` | No | Additional cost info (e.g., `"all supplies provided"`) |
+| `signupUrl` | No | Registration link (e.g., a Givebutter page), shown as a Sign Up button |
 
 ## Body Content
 

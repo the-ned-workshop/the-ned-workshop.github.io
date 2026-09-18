@@ -24,6 +24,8 @@ export interface Event {
   images: EventImage[];
   description: string;
   rsvpWidgetId?: string;
+  // Where to register, shown as a Sign Up button on the event.
+  signupUrl?: string;
 }
 
 export async function getEvents(): Promise<Event[]> {
@@ -87,6 +89,7 @@ export async function getEvents(): Promise<Event[]> {
       images,
       description,
       rsvpWidgetId: data.rsvpWidgetId,
+      signupUrl: data.signupUrl,
     });
   }
 

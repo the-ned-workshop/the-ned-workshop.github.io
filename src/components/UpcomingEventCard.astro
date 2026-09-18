@@ -13,7 +13,7 @@ const { event } = Astro.props;
   its own links, and anchors can't nest. So the title carries the real link and
   stretches an overlay across the card (z-10, above the positioned thumbnail so
   that stays clickable), while description links sit above the overlay at z-20 so
-  a click on one wins over the card-wide link.
+  a click on one wins over the card-wide link. The Sign Up button does the same.
 -->
 <div class="relative bg-white/80 rounded-2xl border border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 group overflow-hidden">
   {event.image && (
@@ -43,6 +43,16 @@ const { event } = Astro.props;
           <span class="font-bold text-amber-700">Cost:</span> {event.cost}
           {event.costNote && ` — ${event.costNote}`}
         </p>
+        {event.signupUrl && (
+          <a
+            href={event.signupUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="relative z-20 !mt-3 inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white font-extrabold uppercase tracking-wider text-sm px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+          >
+            Sign Up
+          </a>
+        )}
       </div>
       {event.image && (
         <div class="hidden md:block relative h-full aspect-square rounded-xl overflow-hidden border border-amber-200">
