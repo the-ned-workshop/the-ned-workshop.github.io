@@ -52,6 +52,12 @@ function parseTime(timeStr: string, dateStr: string): string {
 const startDateTime = parseTime(event.startTime, eventDateStr);
 const endDateTime = parseTime(event.endTime, eventDateStr);
 
+// Whether the event has finished as of this build. Past events keep their
+// `signupUrl` in frontmatter but stop offering it. The daily scheduled deploy
+// is what flips this without anyone having to push.
+const isPast = new Date(endDateTime) < new Date();
+const signupUrl = isPast ? undefined : event.signupUrl;
+
 // Every event is put on by the workshop itself, so it is both the organizer
 // and the performer. The `@id` points at the Organization node BaseLayout
 // emits, so search engines resolve one organization rather than three copies.
@@ -109,8 +115,8 @@ const eventJsonLd = {
     "@type": "Offer",
     "price": offerPrice,
     "priceCurrency": "USD",
-    "availability": "https://schema.org/InStock",
-    "url": event.signupUrl ?? `https://nedworkshop.org/events/${event.slug}/`
+    ...(!isPast && { "availability": "https://schema.org/InStock" }),
+    "url": signupUrl ?? `https://nedworkshop.org/events/${event.slug}/`
   },
   "image": jsonLdImages
 };
@@ -165,15 +171,18 @@ const eventJsonLd = {
             <span class="font-bold text-amber-800">Cost:</span> {event.cost}
             {event.costNote && ` — ${event.costNote}`}
           </p>
-          {event.signupUrl && (
+          {signupUrl && (
             <a
-              href={event.signupUrl}
+              href={signupUrl}
               target="_blank"
               rel="noopener noreferrer"
               class="!mt-4 inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white font-extrabold uppercase tracking-wider px-6 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
             >
               Sign Up
             </a>
+          )}
+          {isPast && event.signupUrl && (
+            <p class="text-lg text-stone-500 italic">This event has ended.</p>
           )}
         </div>
         {event.image && (
