@@ -1,5 +1,5 @@
 ---
-title: Intro to Crochet
+title: Intro to Crochet - Bookmarks
 date: 2026-09-26
 startTime: "3:00 PM"
 endTime: "4:30 PM"
