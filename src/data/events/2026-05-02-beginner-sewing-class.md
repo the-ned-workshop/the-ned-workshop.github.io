@@ -1,5 +1,5 @@
 ---
-title: Beginner Sewing Class - Dog Bandana & Cat Collar
+title: Intro to Sewing - Dog Bandana & Cat Collar
 date: 2026-05-02
 startTime: "1:00 PM"
 endTime: "3:00 PM"
