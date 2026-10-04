@@ -5,8 +5,12 @@ const target = 'https://givebutter.com/diy-spooky-masks-k9rfzo';
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content={`0; url=${target}`} />
-    <link rel="canonical" href={target} />
+    <!-- GitHub Pages can't send a 302, so this stands in for one. The target
+         changes with each campaign: Google reads an instant meta refresh as a
+         permanent redirect and a delayed one as temporary, so the refresh waits
+         a second and there is no canonical. The script still sends visitors
+         over straight away. -->
+    <meta http-equiv="refresh" content={`1; url=${target}`} />
     <meta name="robots" content="noindex" />
     <title>Donate | The Ned Workshop</title>
     <script is:inline define:vars={{ target }}>
